@@ -12,6 +12,9 @@ public class MarketInterceptor implements EconomyTickListener {
 
     @Override
     public void reportEconomyTick(int iterIndex) {
+        if (Global.getSector() == null) return;
+        if (Global.getSector().getEconomy() == null) return;
+
         // Process all markets on economy tick
         for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
             processMarket(market);
@@ -35,10 +38,12 @@ public class MarketInterceptor implements EconomyTickListener {
 
     private static void processSubmarket(SubmarketAPI submarket, String factionId) {
         if (submarket == null || submarket.getCargo() == null) return;
-        if (submarket.getCargo().getMothballedShips() == null) return;
+
+        com.fs.starfarer.api.fleet.FleetDataAPI mothballedShips = submarket.getCargo().getMothballedShips();
+        if (mothballedShips == null) return;
 
         // Process ships for sale
-        List<FleetMemberAPI> ships = submarket.getCargo().getMothballedShips().getMembersListCopy();
+        List<FleetMemberAPI> ships = mothballedShips.getMembersListCopy();
         List<FleetMemberAPI> toRemove = new ArrayList<FleetMemberAPI>();
         List<FleetMemberAPI> toAdd = new ArrayList<FleetMemberAPI>();
 
@@ -52,10 +57,10 @@ public class MarketInterceptor implements EconomyTickListener {
 
         // Apply changes
         for (FleetMemberAPI member : toRemove) {
-            submarket.getCargo().getMothballedShips().removeFleetMember(member);
+            mothballedShips.removeFleetMember(member);
         }
         for (FleetMemberAPI member : toAdd) {
-            submarket.getCargo().getMothballedShips().addFleetMember(member);
+            mothballedShips.addFleetMember(member);
         }
     }
 }
