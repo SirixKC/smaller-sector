@@ -120,8 +120,31 @@ public class DerelictInterceptor implements DiscoverEntityListener {
             return null;
         }
 
-        // Return a variant ID for the replacement hull
-        // Use the base hull variant (hullId + "_Hull" is the standard pattern for hull-only variants)
-        return replacement.getHullId() + "_Hull";
+        // Try to find a valid variant for the replacement hull
+        String hullId = replacement.getHullId();
+
+        // Try standard patterns in order of preference
+        String[] patterns = {
+            hullId + "_Hull",           // Standard hull-only variant
+            hullId + "_standard",       // Some mods use this
+            hullId + "_Standard",       // Case variation
+            hullId                      // Just the hull ID (sometimes works)
+        };
+
+        for (String variantId : patterns) {
+            ShipVariantAPI testVariant = Global.getSettings().getVariant(variantId);
+            if (testVariant != null) {
+                return variantId;
+            }
+        }
+
+        // If no variant found, try to get any variant for this hull
+        java.util.List<String> allVariants = Global.getSettings().getHullIdToVariantListMap().get(hullId);
+        if (allVariants != null && !allVariants.isEmpty()) {
+            return allVariants.get(0);
+        }
+
+        log.warn("DerelictInterceptor: Could not find valid variant for hull " + hullId);
+        return null;
     }
 }
