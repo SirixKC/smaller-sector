@@ -25,7 +25,7 @@ public class FleetInterceptor implements FleetEventListener {
      * Process a newly spawned fleet, replacing cruisers/capitals.
      */
     public static void processFleet(CampaignFleetAPI fleet) {
-        if (fleet == null || fleet.getFaction() == null) return;
+        if (fleet == null || fleet.getFaction() == null || fleet.getFleetData() == null) return;
 
         String factionId = fleet.getFaction().getId();
         List<FleetMemberAPI> toRemove = new ArrayList<FleetMemberAPI>();
