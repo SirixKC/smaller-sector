@@ -16,6 +16,10 @@ public class ShipReplacer {
      * Returns null if ship should not be replaced.
      */
     public static FleetMemberAPI tryReplace(FleetMemberAPI original, String factionId) {
+        if (original == null || original.getHullSpec() == null) {
+            return null;
+        }
+
         // Check faction blacklist
         if (Settings.isFactionBlacklisted(factionId)) {
             return null;
@@ -76,6 +80,10 @@ public class ShipReplacer {
             FleetMemberAPI original,
             String factionId,
             HullSize targetSize) {
+
+        if (original == null || original.getHullSpec() == null) {
+            return null;
+        }
 
         ShipHullSpecAPI replacement = RoleMatcher.findReplacement(
             original.getHullSpec(),
