@@ -4,6 +4,7 @@ import lunalib.lunaSettings.LunaSettings;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -117,14 +118,14 @@ public class Settings {
     // Faction blacklist
     private static Set<String> blacklistCache = null;
 
-    public static Set<String> getFactionBlacklist() {
+    public static synchronized Set<String> getFactionBlacklist() {
         if (blacklistCache == null) {
             reloadBlacklist();
         }
-        return blacklistCache;
+        return Collections.unmodifiableSet(blacklistCache);
     }
 
-    public static void reloadBlacklist() {
+    public static synchronized void reloadBlacklist() {
         String raw = LunaSettings.getString(MOD_ID, "factionBlacklist");
         blacklistCache = new HashSet<String>();
         if (raw != null && !raw.trim().isEmpty()) {
@@ -135,6 +136,7 @@ public class Settings {
     }
 
     public static boolean isFactionBlacklisted(String factionId) {
+        if (factionId == null) return false;
         return getFactionBlacklist().contains(factionId.toLowerCase());
     }
 }
