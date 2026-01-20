@@ -1,2 +1,2 @@
 id,type,text1,text2,text3,text4
-smallersector_cost_modifier,HULLMOD,"Large ships require more resources to operate. This ship has %s crew requirement, %s supply costs, and %s fuel consumption.",,,
+smallersector_cost_modifier,HULLMOD,"Large ships require more resources to operate. This ship has %s crew requirement, %s supply costs, %s fuel consumption, and %s build/purchase cost.",,,

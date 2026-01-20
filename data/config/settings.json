@@ -5,13 +5,6 @@
     "capitalToDestroyer": 40,
     "capitalToCruiser": 25,
 
-    "blueprintSyncEnabled": true,
-    "blueprintCruiserToFrigate": 30,
-    "blueprintCruiserToDestroyer": 50,
-    "blueprintCapitalToFrigate": 20,
-    "blueprintCapitalToDestroyer": 40,
-    "blueprintCapitalToCruiser": 25,
-
     "cruiserCrewMult": 1.5,
     "cruiserSupplyMult": 1.5,
     "cruiserFuelMult": 1.5,
@@ -19,10 +12,11 @@
     "capitalSupplyMult": 2.0,
     "capitalFuelMult": 2.0,
 
-    "frigateSalvageMult": 1.0,
-    "destroyerSalvageMult": 1.0,
-    "cruiserSalvageMult": 0.75,
-    "capitalSalvageMult": 0.5,
+    "cruiserBuildCostMult": 1.5,
+    "capitalBuildCostMult": 2.0,
+
+    "cruiserDmodCount": 2,
+    "capitalDmodCount": 3,
 
     "factionBlacklist": ""
 }

@@ -78,71 +78,9 @@
             "disabled": true
         },
         {
-            "id": "header_blueprint",
-            "type": "header",
-            "text": "Blueprint Replacement"
-        },
-        {
-            "id": "blueprintSyncEnabled",
-            "type": "boolean",
-            "defaultValue": true,
-            "text": "Sync with ship settings",
-            "tooltip": "When enabled, blueprint replacement uses the same percentages as ship replacement"
-        },
-        {
-            "id": "blueprintCruiserToFrigate",
-            "type": "int",
-            "defaultValue": 30,
-            "minValue": 0,
-            "maxValue": 100,
-            "text": "Blueprint Cruiser → Frigate %",
-            "tooltip": "Chance for cruiser blueprints to become frigate blueprints",
-            "enabledIf": {"blueprintSyncEnabled": false}
-        },
-        {
-            "id": "blueprintCruiserToDestroyer",
-            "type": "int",
-            "defaultValue": 50,
-            "minValue": 0,
-            "maxValue": 100,
-            "text": "Blueprint Cruiser → Destroyer %",
-            "tooltip": "Chance for cruiser blueprints to become destroyer blueprints",
-            "enabledIf": {"blueprintSyncEnabled": false}
-        },
-        {
-            "id": "blueprintCapitalToFrigate",
-            "type": "int",
-            "defaultValue": 20,
-            "minValue": 0,
-            "maxValue": 100,
-            "text": "Blueprint Capital → Frigate %",
-            "tooltip": "Chance for capital blueprints to become frigate blueprints",
-            "enabledIf": {"blueprintSyncEnabled": false}
-        },
-        {
-            "id": "blueprintCapitalToDestroyer",
-            "type": "int",
-            "defaultValue": 40,
-            "minValue": 0,
-            "maxValue": 100,
-            "text": "Blueprint Capital → Destroyer %",
-            "tooltip": "Chance for capital blueprints to become destroyer blueprints",
-            "enabledIf": {"blueprintSyncEnabled": false}
-        },
-        {
-            "id": "blueprintCapitalToCruiser",
-            "type": "int",
-            "defaultValue": 25,
-            "minValue": 0,
-            "maxValue": 100,
-            "text": "Blueprint Capital → Cruiser %",
-            "tooltip": "Chance for capital blueprints to become cruiser blueprints",
-            "enabledIf": {"blueprintSyncEnabled": false}
-        },
-        {
             "id": "header_cost",
             "type": "header",
-            "text": "Cost Multipliers"
+            "text": "Operating Cost Multipliers"
         },
         {
             "id": "cruiserCrewMult",
@@ -199,45 +137,50 @@
             "tooltip": "Multiplier for capital fuel consumption"
         },
         {
-            "id": "header_salvage",
+            "id": "header_build",
             "type": "header",
-            "text": "Salvage Chance Multipliers"
+            "text": "Build/Purchase Cost Multipliers"
         },
         {
-            "id": "frigateSalvageMult",
+            "id": "cruiserBuildCostMult",
             "type": "double",
-            "defaultValue": 1.0,
+            "defaultValue": 1.5,
             "minValue": 0.1,
             "maxValue": 10.0,
-            "text": "Frigate Salvage Multiplier",
-            "tooltip": "Multiplier for frigate recovery chance (affects both normal and story point)"
+            "text": "Cruiser Build Cost Multiplier",
+            "tooltip": "Multiplier for cruiser purchase price and colony production cost"
         },
         {
-            "id": "destroyerSalvageMult",
+            "id": "capitalBuildCostMult",
             "type": "double",
-            "defaultValue": 1.0,
+            "defaultValue": 2.0,
             "minValue": 0.1,
             "maxValue": 10.0,
-            "text": "Destroyer Salvage Multiplier",
-            "tooltip": "Multiplier for destroyer recovery chance (affects both normal and story point)"
+            "text": "Capital Build Cost Multiplier",
+            "tooltip": "Multiplier for capital purchase price and colony production cost"
         },
         {
-            "id": "cruiserSalvageMult",
-            "type": "double",
-            "defaultValue": 0.75,
-            "minValue": 0.1,
-            "maxValue": 10.0,
-            "text": "Cruiser Salvage Multiplier",
-            "tooltip": "Multiplier for cruiser recovery chance (affects both normal and story point)"
+            "id": "header_dmod",
+            "type": "header",
+            "text": "D-Mod Penalties (Player-Built Ships)"
         },
         {
-            "id": "capitalSalvageMult",
-            "type": "double",
-            "defaultValue": 0.5,
-            "minValue": 0.1,
-            "maxValue": 10.0,
-            "text": "Capital Salvage Multiplier",
-            "tooltip": "Multiplier for capital recovery chance (affects both normal and story point)"
+            "id": "cruiserDmodCount",
+            "type": "int",
+            "defaultValue": 2,
+            "minValue": 0,
+            "maxValue": 5,
+            "text": "Cruiser D-Mods",
+            "tooltip": "Number of D-mods applied to cruisers built/acquired by the player (simulates difficulty of maintaining large ships)"
+        },
+        {
+            "id": "capitalDmodCount",
+            "type": "int",
+            "defaultValue": 3,
+            "minValue": 0,
+            "maxValue": 5,
+            "text": "Capital D-Mods",
+            "tooltip": "Number of D-mods applied to capitals built/acquired by the player (simulates difficulty of maintaining large ships)"
         },
         {
             "id": "header_blacklist",
@@ -249,7 +192,7 @@
             "type": "string",
             "defaultValue": "",
             "text": "Blacklisted Factions",
-            "tooltip": "Comma-separated faction IDs that are exempt from replacement (e.g., 'abyss, remnants')"
+            "tooltip": "Comma-separated faction IDs that are exempt from replacement (e.g., 'remnant, derelict')"
         }
     ]
 }

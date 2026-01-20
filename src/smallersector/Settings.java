@@ -1,9 +1,7 @@
 package smallersector;
 
 import lunalib.lunaSettings.LunaSettings;
-import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,37 +42,7 @@ public class Settings {
         return Math.max(0, stays);
     }
 
-    // Blueprint replacement (handles sync)
-    public static boolean isBlueprintSyncEnabled() {
-        return LunaSettings.getBoolean(MOD_ID, "blueprintSyncEnabled");
-    }
-
-    public static int getBlueprintCruiserToFrigate() {
-        if (isBlueprintSyncEnabled()) return getCruiserToFrigate();
-        return LunaSettings.getInt(MOD_ID, "blueprintCruiserToFrigate");
-    }
-
-    public static int getBlueprintCruiserToDestroyer() {
-        if (isBlueprintSyncEnabled()) return getCruiserToDestroyer();
-        return LunaSettings.getInt(MOD_ID, "blueprintCruiserToDestroyer");
-    }
-
-    public static int getBlueprintCapitalToFrigate() {
-        if (isBlueprintSyncEnabled()) return getCapitalToFrigate();
-        return LunaSettings.getInt(MOD_ID, "blueprintCapitalToFrigate");
-    }
-
-    public static int getBlueprintCapitalToDestroyer() {
-        if (isBlueprintSyncEnabled()) return getCapitalToDestroyer();
-        return LunaSettings.getInt(MOD_ID, "blueprintCapitalToDestroyer");
-    }
-
-    public static int getBlueprintCapitalToCruiser() {
-        if (isBlueprintSyncEnabled()) return getCapitalToCruiser();
-        return LunaSettings.getInt(MOD_ID, "blueprintCapitalToCruiser");
-    }
-
-    // Cost multipliers
+    // Operating cost multipliers
     public static float getCruiserCrewMult() {
         return LunaSettings.getFloat(MOD_ID, "cruiserCrewMult");
     }
@@ -99,19 +67,45 @@ public class Settings {
         return LunaSettings.getFloat(MOD_ID, "capitalFuelMult");
     }
 
-    // Salvage multipliers
-    public static float getSalvageMult(HullSize size) {
+    // Build/purchase cost multipliers
+    public static float getCruiserBuildCostMult() {
+        return LunaSettings.getFloat(MOD_ID, "cruiserBuildCostMult");
+    }
+
+    public static float getCapitalBuildCostMult() {
+        return LunaSettings.getFloat(MOD_ID, "capitalBuildCostMult");
+    }
+
+    public static float getBuildCostMult(HullSize size) {
+        if (size == null) return 1.0f;
         switch (size) {
-            case FRIGATE:
-                return LunaSettings.getFloat(MOD_ID, "frigateSalvageMult");
-            case DESTROYER:
-                return LunaSettings.getFloat(MOD_ID, "destroyerSalvageMult");
             case CRUISER:
-                return LunaSettings.getFloat(MOD_ID, "cruiserSalvageMult");
+                return getCruiserBuildCostMult();
             case CAPITAL_SHIP:
-                return LunaSettings.getFloat(MOD_ID, "capitalSalvageMult");
+                return getCapitalBuildCostMult();
             default:
                 return 1.0f;
+        }
+    }
+
+    // D-mod counts for player-built ships
+    public static int getCruiserDmodCount() {
+        return LunaSettings.getInt(MOD_ID, "cruiserDmodCount");
+    }
+
+    public static int getCapitalDmodCount() {
+        return LunaSettings.getInt(MOD_ID, "capitalDmodCount");
+    }
+
+    public static int getDmodCount(HullSize size) {
+        if (size == null) return 0;
+        switch (size) {
+            case CRUISER:
+                return getCruiserDmodCount();
+            case CAPITAL_SHIP:
+                return getCapitalDmodCount();
+            default:
+                return 0;
         }
     }
 

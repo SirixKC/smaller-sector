@@ -20,6 +20,7 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
     private FleetSpawnListener fleetSpawnListener;
     private MarketInterceptor marketInterceptor;
     private SalvageInterceptor salvageInterceptor;
+    private PlayerFleetMonitor playerFleetMonitor;
 
     @Override
     public void onApplicationLoad() throws Exception {
@@ -67,8 +68,13 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
         salvageInterceptor = new SalvageInterceptor();
         listeners.addListener(salvageInterceptor, true);
 
-        // Apply cost hull mod to all cruisers and capitals
+        // Player fleet monitor for D-mods and cost hull mod
+        playerFleetMonitor = new PlayerFleetMonitor();
+        Global.getSector().addTransientScript(playerFleetMonitor);
+
+        // Initial processing of player fleet
         applyCostHullMod();
+        DmodApplicator.processPlayerFleet();
 
         log.info("Smaller Sector: Game initialization complete.");
     }
@@ -80,8 +86,9 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
 
     @Override
     public void afterGameSave() {
-        // Re-apply cost hull mod in case of any issues
+        // Re-apply modifiers in case of any issues
         applyCostHullMod();
+        DmodApplicator.processPlayerFleet();
     }
 
     /**
