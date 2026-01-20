@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SmallerSector" default="build" basedir=".">
+
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="jar.dir" value="jars"/>
+    <property name="jar.name" value="SmallerSector.jar"/>
+
+    <!-- Update this path to your Starsector installation -->
+    <property name="starsector.dir" value="${user.home}/.local/share/Steam/steamapps/common/Starsector"/>
+    <property name="starsector.core" value="${starsector.dir}/starsector-core"/>
+
+    <!-- LunaLib location - update if needed -->
+    <property name="lunalib.dir" value="${starsector.dir}/mods/LunaLib"/>
+
+    <path id="compile.classpath">
+        <fileset dir="${starsector.core}">
+            <include name="starfarer.api.jar"/>
+            <include name="lwjgl.jar"/>
+            <include name="lwjgl_util.jar"/>
+            <include name="log4j-1.2.9.jar"/>
+            <include name="json.jar"/>
+        </fileset>
+        <fileset dir="${lunalib.dir}/jars" erroronmissingdir="false">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}"
+               destdir="${build.dir}"
+               classpathref="compile.classpath"
+               source="1.7"
+               target="1.7"
+               includeantruntime="false"
+               debug="true">
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${jar.name}">
+            <fileset dir="${build.dir}"/>
+        </jar>
+    </target>
+
+    <target name="build" depends="clean,jar">
+        <echo>Build complete: ${jar.dir}/${jar.name}</echo>
+    </target>
+
+</project>
