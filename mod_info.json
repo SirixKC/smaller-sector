@@ -1,0 +1,12 @@
+{
+    "id": "smallersector",
+    "name": "Smaller Sector",
+    "author": "Sirix",
+    "version": "1.0.0",
+    "description": "Makes cruisers and capital ships rarer and more impactful. Configurable replacement chances, cost multipliers, and salvage modifiers.",
+    "gameVersion": "0.97a-RC11",
+    "dependencies": [
+        {"id": "lunalib", "name": "LunaLib"}
+    ],
+    "modPlugin": "smallersector.SmallerSectorModPlugin"
+}
