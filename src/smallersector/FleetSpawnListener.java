@@ -1,6 +1,5 @@
 package smallersector;
 
-import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.BaseCampaignEventListener;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 
@@ -12,13 +11,18 @@ public class FleetSpawnListener extends BaseCampaignEventListener {
 
     @Override
     public void reportFleetSpawned(CampaignFleetAPI fleet) {
+        // Null safety check
+        if (fleet == null) return;
+
         // Skip player fleet
         if (fleet.isPlayerFleet()) return;
 
         // Skip fleets with memory flags indicating scripted/story spawns
-        if (fleet.getMemoryWithoutUpdate().contains("$defenderFleet") ||
-            fleet.getMemoryWithoutUpdate().contains("$storyFleet") ||
-            fleet.getMemoryWithoutUpdate().contains("$missionFleet")) {
+        com.fs.starfarer.api.campaign.rules.MemoryAPI memory = fleet.getMemoryWithoutUpdate();
+        if (memory != null &&
+            (memory.contains("$defenderFleet") ||
+             memory.contains("$storyFleet") ||
+             memory.contains("$missionFleet"))) {
             return;
         }
 
