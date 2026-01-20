@@ -8,6 +8,8 @@ import java.util.*;
 
 public class RoleMatcher {
 
+    private static final Random RANDOM = new Random();
+
     // Role categories based on ship hints/tags
     public enum Role {
         COMBAT,
@@ -18,6 +20,12 @@ public class RoleMatcher {
     }
 
     public static Set<Role> getRoles(ShipHullSpecAPI hull) {
+        if (hull == null) {
+            Set<Role> empty = new HashSet<Role>();
+            empty.add(Role.COMBAT);
+            return empty;
+        }
+
         Set<Role> roles = new HashSet<Role>();
 
         Set<String> tags = hull.getTags();
@@ -76,6 +84,10 @@ public class RoleMatcher {
             String factionId,
             HullSize targetSize) {
 
+        if (original == null || factionId == null || targetSize == null) {
+            return null;
+        }
+
         Set<Role> originalRoles = getRoles(original);
         List<ShipHullSpecAPI> factionShips = getFactionShips(factionId, targetSize);
 
@@ -123,8 +135,16 @@ public class RoleMatcher {
     private static List<ShipHullSpecAPI> getFactionShips(String factionId, HullSize size) {
         List<ShipHullSpecAPI> result = new ArrayList<ShipHullSpecAPI>();
 
-        // Get faction's known ships
-        Set<String> knownShips = Global.getSector().getFaction(factionId).getKnownShips();
+        if (factionId == null || Global.getSector() == null) {
+            return result;
+        }
+
+        com.fs.starfarer.api.campaign.FactionAPI faction = Global.getSector().getFaction(factionId);
+        if (faction == null) {
+            return result;
+        }
+
+        Set<String> knownShips = faction.getKnownShips();
 
         for (String hullId : knownShips) {
             ShipHullSpecAPI hull = Global.getSettings().getHullSpec(hullId);
@@ -152,7 +172,6 @@ public class RoleMatcher {
 
     private static ShipHullSpecAPI pickRandom(List<ShipHullSpecAPI> ships) {
         if (ships.isEmpty()) return null;
-        Random rand = new Random();
-        return ships.get(rand.nextInt(ships.size()));
+        return ships.get(RANDOM.nextInt(ships.size()));
     }
 }
