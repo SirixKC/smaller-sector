@@ -23,6 +23,7 @@ public class DerelictInterceptor implements DiscoverEntityListener {
 
     private static final Logger log = Global.getLogger(DerelictInterceptor.class);
     private static final Random random = new Random();
+    private static final String PROCESSED_TAG = "smallersector_derelict_processed";
 
     @Override
     public void reportEntityDiscovered(SectorEntityToken entity) {
@@ -37,6 +38,11 @@ public class DerelictInterceptor implements DiscoverEntityListener {
         DerelictShipData data = plugin.getData();
 
         if (data == null || data.ship == null) {
+            return;
+        }
+
+        // Skip if already processed (prevents re-rolling on game load)
+        if (entity.hasTag(PROCESSED_TAG)) {
             return;
         }
 
@@ -79,6 +85,9 @@ public class DerelictInterceptor implements DiscoverEntityListener {
             shipData.variantId = replacementVariantId;
             shipData.variant = null; // Clear cached variant so it reloads
         }
+
+        // Mark as processed
+        entity.addTag(PROCESSED_TAG);
     }
 
     private String tryGetReplacement(ShipVariantAPI original, String factionId, HullSize size) {
