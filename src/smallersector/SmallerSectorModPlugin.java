@@ -3,9 +3,12 @@ package smallersector;
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.LocationAPI;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.ListenerManagerAPI;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
+import lunalib.lunaSettings.LunaSettings;
 import org.apache.log4j.Logger;
 
 /**
@@ -33,6 +36,12 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(
                 "Smaller Sector requires LunaLib! Please install LunaLib and restart.");
+        }
+
+        // Register preset listener to sync UI sliders when preset changes
+        if (!LunaSettings.hasSettingsListenerOfClass(PresetListener.class)) {
+            LunaSettings.addSettingsListener(new PresetListener());
+            log.info("Smaller Sector: Registered preset listener.");
         }
 
         log.info("Smaller Sector: Mod loaded successfully.");
@@ -77,9 +86,21 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
         playerFleetMonitor = new PlayerFleetMonitor();
         Global.getSector().addTransientScript(playerFleetMonitor);
 
+        // Add Faction Manager intel item (if not already present)
+        if (!FactionManagerIntel.exists()) {
+            Global.getSector().getIntelManager().addIntel(new FactionManagerIntel());
+            log.info("Smaller Sector: Added Faction Manager intel item.");
+        }
+
         // Initial processing of player fleet
         applyCostHullMod();
         DmodApplicator.processPlayerFleet();
+
+        // Process all existing fleets (for existing saves)
+        processAllExistingFleets();
+
+        // Initial processing of all markets (don't wait for economy tick)
+        processAllMarkets();
 
         log.info("Smaller Sector: Game initialization complete.");
     }
@@ -126,5 +147,45 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
         if (!member.getVariant().hasHullMod(hullModId)) {
             member.getVariant().addPermaMod(hullModId, false);
         }
+    }
+
+    /**
+     * Process all markets immediately on game load.
+     * This ensures ships are replaced right away, not just on economy ticks.
+     */
+    private void processAllMarkets() {
+        if (Global.getSector() == null) return;
+        if (Global.getSector().getEconomy() == null) return;
+
+        log.info("Smaller Sector: Processing all markets on game load...");
+        int count = 0;
+        for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
+            MarketInterceptor.processMarket(market);
+            count++;
+        }
+        log.info("Smaller Sector: Processed " + count + " markets.");
+    }
+
+    /**
+     * Process all existing fleets in the sector.
+     * This allows the mod to work on existing saves without requiring a new game.
+     * Fleets are tagged after processing to prevent re-rolling on subsequent loads.
+     */
+    private void processAllExistingFleets() {
+        if (Global.getSector() == null) return;
+
+        log.info("Smaller Sector: Processing all existing fleets...");
+        int count = 0;
+
+        // Process fleets in all locations (star systems, hyperspace, etc.)
+        for (LocationAPI location : Global.getSector().getAllLocations()) {
+            for (CampaignFleetAPI fleet : location.getFleets()) {
+                if (fleet == null || fleet.isPlayerFleet()) continue;
+                FleetInterceptor.processFleet(fleet);
+                count++;
+            }
+        }
+
+        log.info("Smaller Sector: Processed " + count + " existing fleets.");
     }
 }

@@ -10,13 +10,39 @@ public class Settings {
 
     private static final String MOD_ID = "smallersector";
 
+    // Preset names
+    private static final String PRESET_CUSTOM = "Custom";
+    private static final String PRESET_VANILLA = "Vanilla";
+    private static final String PRESET_RECOMMENDED = "Sirix Recommended";
+    private static final String PRESET_HARDCORE = "Sirix Hardcore";
+
+    /**
+     * Get the currently selected preset.
+     */
+    public static String getPreset() {
+        String val = LunaSettings.getString(MOD_ID, "preset");
+        return val != null ? val : PRESET_RECOMMENDED;
+    }
+
     // Cruiser replacement
     public static int getCruiserToFrigate() {
-        return LunaSettings.getInt(MOD_ID, "cruiserToFrigate");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 0;
+        if (PRESET_RECOMMENDED.equals(preset)) return 30;
+        if (PRESET_HARDCORE.equals(preset)) return 50;
+        // Custom - use individual setting
+        Integer val = LunaSettings.getInt(MOD_ID, "cruiserToFrigate");
+        return val != null ? val : 30;
     }
 
     public static int getCruiserToDestroyer() {
-        return LunaSettings.getInt(MOD_ID, "cruiserToDestroyer");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 0;
+        if (PRESET_RECOMMENDED.equals(preset)) return 50;
+        if (PRESET_HARDCORE.equals(preset)) return 45;
+        // Custom
+        Integer val = LunaSettings.getInt(MOD_ID, "cruiserToDestroyer");
+        return val != null ? val : 50;
     }
 
     public static int getCruiserStays() {
@@ -26,15 +52,33 @@ public class Settings {
 
     // Capital replacement
     public static int getCapitalToFrigate() {
-        return LunaSettings.getInt(MOD_ID, "capitalToFrigate");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 0;
+        if (PRESET_RECOMMENDED.equals(preset)) return 20;
+        if (PRESET_HARDCORE.equals(preset)) return 40;
+        // Custom
+        Integer val = LunaSettings.getInt(MOD_ID, "capitalToFrigate");
+        return val != null ? val : 20;
     }
 
     public static int getCapitalToDestroyer() {
-        return LunaSettings.getInt(MOD_ID, "capitalToDestroyer");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 0;
+        if (PRESET_RECOMMENDED.equals(preset)) return 40;
+        if (PRESET_HARDCORE.equals(preset)) return 40;
+        // Custom
+        Integer val = LunaSettings.getInt(MOD_ID, "capitalToDestroyer");
+        return val != null ? val : 40;
     }
 
     public static int getCapitalToCruiser() {
-        return LunaSettings.getInt(MOD_ID, "capitalToCruiser");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 0;
+        if (PRESET_RECOMMENDED.equals(preset)) return 25;
+        if (PRESET_HARDCORE.equals(preset)) return 18;
+        // Custom
+        Integer val = LunaSettings.getInt(MOD_ID, "capitalToCruiser");
+        return val != null ? val : 25;
     }
 
     public static int getCapitalStays() {
@@ -44,36 +88,84 @@ public class Settings {
 
     // Operating cost multipliers
     public static float getCruiserCrewMult() {
-        return LunaSettings.getFloat(MOD_ID, "cruiserCrewMult");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 1.5f;
+        if (PRESET_HARDCORE.equals(preset)) return 2.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "cruiserCrewMult");
+        return val != null ? val.floatValue() : 1.5f;
     }
 
     public static float getCruiserSupplyMult() {
-        return LunaSettings.getFloat(MOD_ID, "cruiserSupplyMult");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 1.5f;
+        if (PRESET_HARDCORE.equals(preset)) return 3.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "cruiserSupplyMult");
+        return val != null ? val.floatValue() : 1.5f;
     }
 
     public static float getCruiserFuelMult() {
-        return LunaSettings.getFloat(MOD_ID, "cruiserFuelMult");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 1.5f;
+        if (PRESET_HARDCORE.equals(preset)) return 3.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "cruiserFuelMult");
+        return val != null ? val.floatValue() : 1.5f;
     }
 
     public static float getCapitalCrewMult() {
-        return LunaSettings.getFloat(MOD_ID, "capitalCrewMult");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 2.0f;
+        if (PRESET_HARDCORE.equals(preset)) return 3.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "capitalCrewMult");
+        return val != null ? val.floatValue() : 2.0f;
     }
 
     public static float getCapitalSupplyMult() {
-        return LunaSettings.getFloat(MOD_ID, "capitalSupplyMult");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 2.0f;
+        if (PRESET_HARDCORE.equals(preset)) return 4.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "capitalSupplyMult");
+        return val != null ? val.floatValue() : 2.0f;
     }
 
     public static float getCapitalFuelMult() {
-        return LunaSettings.getFloat(MOD_ID, "capitalFuelMult");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 2.0f;
+        if (PRESET_HARDCORE.equals(preset)) return 4.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "capitalFuelMult");
+        return val != null ? val.floatValue() : 2.0f;
     }
 
     // Build/purchase cost multipliers
     public static float getCruiserBuildCostMult() {
-        return LunaSettings.getFloat(MOD_ID, "cruiserBuildCostMult");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 1.5f;
+        if (PRESET_HARDCORE.equals(preset)) return 3.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "cruiserBuildCostMult");
+        return val != null ? val.floatValue() : 1.5f;
     }
 
     public static float getCapitalBuildCostMult() {
-        return LunaSettings.getFloat(MOD_ID, "capitalBuildCostMult");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 2.0f;
+        if (PRESET_HARDCORE.equals(preset)) return 5.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "capitalBuildCostMult");
+        return val != null ? val.floatValue() : 2.0f;
     }
 
     public static float getBuildCostMult(HullSize size) {
@@ -90,11 +182,23 @@ public class Settings {
 
     // D-mod counts for player-built ships
     public static int getCruiserDmodCount() {
-        return LunaSettings.getInt(MOD_ID, "cruiserDmodCount");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 0;
+        if (PRESET_RECOMMENDED.equals(preset)) return 2;
+        if (PRESET_HARDCORE.equals(preset)) return 3;
+        // Custom
+        Integer val = LunaSettings.getInt(MOD_ID, "cruiserDmodCount");
+        return val != null ? val : 2;
     }
 
     public static int getCapitalDmodCount() {
-        return LunaSettings.getInt(MOD_ID, "capitalDmodCount");
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 0;
+        if (PRESET_RECOMMENDED.equals(preset)) return 3;
+        if (PRESET_HARDCORE.equals(preset)) return 5;
+        // Custom
+        Integer val = LunaSettings.getInt(MOD_ID, "capitalDmodCount");
+        return val != null ? val : 3;
     }
 
     public static int getDmodCount(HullSize size) {
@@ -112,6 +216,49 @@ public class Settings {
     // Faction blacklist
     private static Set<String> blacklistCache = null;
 
+    // Default blacklist for Sirix presets
+    // These are AI/special factions that shouldn't have their ships replaced
+    private static final Set<String> SIRIX_DEFAULT_BLACKLIST;
+    static {
+        Set<String> defaults = new HashSet<String>();
+        // Vanilla factions
+        defaults.add("remnant");
+        defaults.add("omega");
+        defaults.add("derelict");
+        // HMI - Nightmarish Horror
+        defaults.add("hmi_nightmare");
+        // HMI - Mess (Opuntia/Mansa)
+        defaults.add("mess");
+        // JaydeePiracy - ERROR: DATA INVALID (Deadcomm)
+        defaults.add("jdp_deadcomm");
+        // Emergent Threats - Threat
+        defaults.add("threat");
+        // Random Assortment of Things - Abyssals
+        defaults.add("rat_abyssals");
+        defaults.add("rat_abyssals_primordials");
+        defaults.add("rat_abyssals_deep");
+        defaults.add("rat_abyssals_harmony");
+        defaults.add("rat_abyssals_serenity");
+        defaults.add("rat_abyssals_sim");
+        defaults.add("rat_abyssals_solitude");
+        defaults.add("rat_abyssals_wastes");
+        // Secrets of the Frontier - Dreaming Gestalt
+        defaults.add("sotf_dreaminggestalt");
+        // Elysians
+        defaults.add("zea_elysians");
+        // Duskborne
+        defaults.add("zea_dusk");
+        // Dawntide
+        defaults.add("zea_dawn");
+        // Phase-Warped Omega
+        defaults.add("khewarpedomega");
+        // MagicLib - Bounty Target
+        defaults.add("ml_bounty");
+        // Nexerelin - Derelict (Domain Exploration)
+        defaults.add("nex_derelict");
+        SIRIX_DEFAULT_BLACKLIST = Collections.unmodifiableSet(defaults);
+    }
+
     public static synchronized Set<String> getFactionBlacklist() {
         if (blacklistCache == null) {
             reloadBlacklist();
@@ -120,8 +267,21 @@ public class Settings {
     }
 
     public static synchronized void reloadBlacklist() {
-        String raw = LunaSettings.getString(MOD_ID, "factionBlacklist");
+        String preset = getPreset();
         blacklistCache = new HashSet<String>();
+
+        // Vanilla preset: no blacklist (apply to all factions)
+        if (PRESET_VANILLA.equals(preset)) {
+            return;
+        }
+
+        // Sirix presets: start with default blacklist
+        if (PRESET_RECOMMENDED.equals(preset) || PRESET_HARDCORE.equals(preset)) {
+            blacklistCache.addAll(SIRIX_DEFAULT_BLACKLIST);
+        }
+
+        // Add any user-configured factions (for Custom, or additions to Sirix presets)
+        String raw = LunaSettings.getString(MOD_ID, "factionBlacklist");
         if (raw != null && !raw.trim().isEmpty()) {
             for (String faction : raw.split(",")) {
                 blacklistCache.add(faction.trim().toLowerCase());

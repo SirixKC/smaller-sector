@@ -6,12 +6,14 @@
     <property name="jar.dir" value="jars"/>
     <property name="jar.name" value="SmallerSector.jar"/>
 
-    <!-- Update this path to your Starsector installation -->
-    <property name="starsector.dir" value="${user.home}/.local/share/Steam/steamapps/common/Starsector"/>
-    <property name="starsector.core" value="${starsector.dir}/starsector-core"/>
+    <!-- Starsector installation path (native Linux install for core jars) -->
+    <property name="starsector.dir" value="${user.home}/Documents/starsector"/>
+    <property name="starsector.core" value="${starsector.dir}"/>
 
-    <!-- LunaLib location - update if needed -->
-    <property name="lunalib.dir" value="${starsector.dir}/mods/LunaLib"/>
+    <!-- Mods directory -->
+    <property name="mods.dir" value="${starsector.dir}/mods"/>
+    <property name="lunalib.dir" value="${mods.dir}/LunaLib"/>
+    <property name="lazylib.dir" value="${mods.dir}/LazyLib"/>
 
     <path id="compile.classpath">
         <fileset dir="${starsector.core}">
@@ -22,6 +24,9 @@
             <include name="json.jar"/>
         </fileset>
         <fileset dir="${lunalib.dir}/jars" erroronmissingdir="false">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${lazylib.dir}/jars" erroronmissingdir="false">
             <include name="*.jar"/>
         </fileset>
     </path>
@@ -35,8 +40,8 @@
         <javac srcdir="${src.dir}"
                destdir="${build.dir}"
                classpathref="compile.classpath"
-               source="1.7"
-               target="1.7"
+               source="17"
+               target="17"
                includeantruntime="false"
                debug="true">
         </javac>
