@@ -97,8 +97,8 @@ public class MarketInterceptor implements EconomyTickListener, ColonyInteraction
 
     @Override
     public void reportPlayerOpenedMarket(MarketAPI market) {
-        // Process when player first opens a market (catches first encounters)
-        processMarket(market);
+        // Don't process here - cargo may not be loaded yet
+        // Use reportPlayerOpenedMarketAndCargoUpdated instead
     }
 
     @Override
@@ -148,6 +148,12 @@ public class MarketInterceptor implements EconomyTickListener, ColonyInteraction
         for (SubmarketAPI submarket : market.getSubmarketsCopy()) {
             // Skip if already processed this refresh cycle
             if (!shouldProcess(market, submarket)) {
+                continue;
+            }
+
+            // Only mark as processed if cargo actually exists
+            // (cargo is lazy-loaded and may be null on first access)
+            if (submarket.getCargo() == null) {
                 continue;
             }
 
