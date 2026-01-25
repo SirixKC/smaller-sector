@@ -48,9 +48,6 @@ public class PresetListener implements LunaSettingsListener {
         VANILLA_VALUES.put("capitalCrewMult", 1.0);
         VANILLA_VALUES.put("capitalSupplyMult", 1.0);
         VANILLA_VALUES.put("capitalFuelMult", 1.0);
-        VANILLA_VALUES.put("globalProductionMult", 1.0);
-        VANILLA_VALUES.put("cruiserProductionMult", 1.0);
-        VANILLA_VALUES.put("capitalProductionMult", 1.0);
         VANILLA_VALUES.put("cruiserBuildCostMult", 1.0);
         VANILLA_VALUES.put("capitalBuildCostMult", 1.0);
         VANILLA_VALUES.put("cruiserDmodCount", 0);
@@ -69,9 +66,6 @@ public class PresetListener implements LunaSettingsListener {
         RECOMMENDED_VALUES.put("capitalCrewMult", 2.0);
         RECOMMENDED_VALUES.put("capitalSupplyMult", 2.0);
         RECOMMENDED_VALUES.put("capitalFuelMult", 2.0);
-        RECOMMENDED_VALUES.put("globalProductionMult", 1.0);
-        RECOMMENDED_VALUES.put("cruiserProductionMult", 2.0);
-        RECOMMENDED_VALUES.put("capitalProductionMult", 3.0);
         RECOMMENDED_VALUES.put("cruiserBuildCostMult", 1.5);
         RECOMMENDED_VALUES.put("capitalBuildCostMult", 2.0);
         RECOMMENDED_VALUES.put("cruiserDmodCount", 2);
@@ -90,9 +84,6 @@ public class PresetListener implements LunaSettingsListener {
         HARDCORE_VALUES.put("capitalCrewMult", 3.0);
         HARDCORE_VALUES.put("capitalSupplyMult", 4.0);
         HARDCORE_VALUES.put("capitalFuelMult", 4.0);
-        HARDCORE_VALUES.put("globalProductionMult", 2.0);
-        HARDCORE_VALUES.put("cruiserProductionMult", 4.0);
-        HARDCORE_VALUES.put("capitalProductionMult", 6.0);
         HARDCORE_VALUES.put("cruiserBuildCostMult", 3.0);
         HARDCORE_VALUES.put("capitalBuildCostMult", 5.0);
         HARDCORE_VALUES.put("cruiserDmodCount", 3);
@@ -105,8 +96,15 @@ public class PresetListener implements LunaSettingsListener {
         if (!MOD_ID.equals(modID)) return;
 
         // Always update multipliers when settings change
-        ProductionTimeModifier.onSettingsChanged();
         BaseValueModifier.applyMultipliers();
+
+        // Show warning that save/reload is needed for operating costs
+        if (com.fs.starfarer.api.Global.getSector() != null) {
+            com.fs.starfarer.api.Global.getSector().getCampaignUI().addMessage(
+                "Smaller Sector: Operating cost changes (crew/supply/fuel) require SAVE and RELOAD to take effect.",
+                com.fs.starfarer.api.util.Misc.getNegativeHighlightColor()
+            );
+        }
 
         String currentPreset = LunaSettings.getString(MOD_ID, "preset");
         if (currentPreset == null) currentPreset = "Sirix Recommended";

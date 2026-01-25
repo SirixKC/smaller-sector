@@ -24,7 +24,6 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
     private MarketInterceptor marketInterceptor;
     private DerelictInterceptor derelictInterceptor;
     private PlayerFleetMonitor playerFleetMonitor;
-    private ProductionTimeModifier productionTimeModifier;
 
     @Override
     public void onApplicationLoad() throws Exception {
@@ -85,10 +84,6 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
         // Player fleet monitor for D-mods and cost hull mod
         playerFleetMonitor = new PlayerFleetMonitor();
         Global.getSector().addTransientScript(playerFleetMonitor);
-
-        // Production time modifier for cruisers/capitals
-        productionTimeModifier = new ProductionTimeModifier();
-        Global.getSector().addTransientScript(productionTimeModifier);
 
         // Add Faction Manager intel item (if not already present)
         if (!FactionManagerIntel.exists()) {

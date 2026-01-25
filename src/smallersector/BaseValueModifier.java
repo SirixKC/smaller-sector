@@ -69,6 +69,12 @@ public class BaseValueModifier {
             float multiplier = Settings.getBuildCostMult(size);
             float newValue = originalValue * multiplier;
 
+            // Log first few ships for debugging
+            if (modified < 3) {
+                log.info("Smaller Sector: Build cost [" + hullId + "] (" + size + "): " +
+                         originalValue + " * " + multiplier + " = " + newValue);
+            }
+
             if (setBaseValue(spec, newValue)) {
                 modified++;
             }

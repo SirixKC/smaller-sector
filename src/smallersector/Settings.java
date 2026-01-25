@@ -9,6 +9,7 @@ import java.util.Set;
 public class Settings {
 
     private static final String MOD_ID = "smallersector";
+    private static final org.apache.log4j.Logger log = com.fs.starfarer.api.Global.getLogger(Settings.class);
 
     // Preset names
     private static final String PRESET_CUSTOM = "Custom";
@@ -21,7 +22,9 @@ public class Settings {
      */
     public static String getPreset() {
         String val = LunaSettings.getString(MOD_ID, "preset");
-        return val != null ? val : PRESET_RECOMMENDED;
+        String result = val != null ? val : PRESET_RECOMMENDED;
+        log.info("Settings.getPreset() = '" + result + "' (raw: " + val + ")");
+        return result;
     }
 
     // Cruiser replacement
@@ -94,7 +97,9 @@ public class Settings {
         if (PRESET_HARDCORE.equals(preset)) return 2.0f;
         // Custom
         Double val = LunaSettings.getDouble(MOD_ID, "cruiserCrewMult");
-        return val != null ? val.floatValue() : 1.5f;
+        float result = val != null ? val.floatValue() : 1.5f;
+        log.info("Settings.getCruiserCrewMult() = " + result + " (raw LunaSettings: " + val + ")");
+        return result;
     }
 
     public static float getCruiserSupplyMult() {
@@ -147,51 +152,7 @@ public class Settings {
         return val != null ? val.floatValue() : 2.0f;
     }
 
-    // Production time multipliers
-    public static float getGlobalProductionMult() {
-        String preset = getPreset();
-        if (PRESET_VANILLA.equals(preset)) return 1.0f;
-        if (PRESET_RECOMMENDED.equals(preset)) return 1.0f;
-        if (PRESET_HARDCORE.equals(preset)) return 2.0f;
-        // Custom
-        Double val = LunaSettings.getDouble(MOD_ID, "globalProductionMult");
-        return val != null ? val.floatValue() : 1.0f;
-    }
-
-    public static float getCruiserProductionMult() {
-        String preset = getPreset();
-        if (PRESET_VANILLA.equals(preset)) return 1.0f;
-        if (PRESET_RECOMMENDED.equals(preset)) return 2.0f;
-        if (PRESET_HARDCORE.equals(preset)) return 4.0f;
-        // Custom
-        Double val = LunaSettings.getDouble(MOD_ID, "cruiserProductionMult");
-        return val != null ? val.floatValue() : 2.0f;
-    }
-
-    public static float getCapitalProductionMult() {
-        String preset = getPreset();
-        if (PRESET_VANILLA.equals(preset)) return 1.0f;
-        if (PRESET_RECOMMENDED.equals(preset)) return 3.0f;
-        if (PRESET_HARDCORE.equals(preset)) return 6.0f;
-        // Custom
-        Double val = LunaSettings.getDouble(MOD_ID, "capitalProductionMult");
-        return val != null ? val.floatValue() : 3.0f;
-    }
-
-    public static float getProductionTimeMult(HullSize size) {
-        if (size == null) return 1.0f;
-        float globalMult = getGlobalProductionMult();
-        switch (size) {
-            case CRUISER:
-                return globalMult * getCruiserProductionMult();
-            case CAPITAL_SHIP:
-                return globalMult * getCapitalProductionMult();
-            default:
-                return globalMult;
-        }
-    }
-
-    // Build/production cost multipliers (affects base value)
+    // Build cost multipliers (affects base value)
     public static float getCruiserBuildCostMult() {
         String preset = getPreset();
         if (PRESET_VANILLA.equals(preset)) return 1.0f;
@@ -214,14 +175,19 @@ public class Settings {
 
     public static float getBuildCostMult(HullSize size) {
         if (size == null) return 1.0f;
+        float result;
         switch (size) {
             case CRUISER:
-                return getCruiserBuildCostMult();
+                result = getCruiserBuildCostMult();
+                break;
             case CAPITAL_SHIP:
-                return getCapitalBuildCostMult();
+                result = getCapitalBuildCostMult();
+                break;
             default:
-                return 1.0f;
+                result = 1.0f;
         }
+        log.info("Settings.getBuildCostMult(" + size + ") = " + result);
+        return result;
     }
 
     // D-mod counts for player-built ships
@@ -314,17 +280,12 @@ public class Settings {
         String preset = getPreset();
         blacklistCache = new HashSet<String>();
 
-        // Vanilla preset: no blacklist (apply to all factions)
-        if (PRESET_VANILLA.equals(preset)) {
-            return;
-        }
-
-        // Sirix presets: start with default blacklist
+        // Sirix presets: start with default blacklist (AI/special factions)
         if (PRESET_RECOMMENDED.equals(preset) || PRESET_HARDCORE.equals(preset)) {
             blacklistCache.addAll(SIRIX_DEFAULT_BLACKLIST);
         }
 
-        // Add any user-configured factions (for Custom, or additions to Sirix presets)
+        // Always add user-configured factions regardless of preset
         String raw = LunaSettings.getString(MOD_ID, "factionBlacklist");
         if (raw != null && !raw.trim().isEmpty()) {
             for (String faction : raw.split(",")) {
