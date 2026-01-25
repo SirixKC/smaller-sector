@@ -7,7 +7,7 @@
     <property name="jar.name" value="SmallerSector.jar"/>
 
     <!-- Starsector installation path (native Linux install for core jars) -->
-    <property name="starsector.dir" value="${user.home}/Documents/starsector"/>
+    <property name="starsector.dir" value="${user.home}/Documents/Games/starsector"/>
     <property name="starsector.core" value="${starsector.dir}"/>
 
     <!-- Mods directory -->

@@ -4,9 +4,11 @@
     "author": "Sirix",
     "version": "1.0.0",
     "description": "Makes cruisers and capital ships rarer and more impactful. Configurable replacement chances, cost multipliers, and salvage modifiers.",
-    "gameVersion": "0.97a-RC11",
+    "gameVersion": "0.98a-RC8",
+    "jars": ["jars/SmallerSector.jar"],
     "dependencies": [
-        {"id": "lunalib", "name": "LunaLib"}
+        {"id": "lunalib", "name": "LunaLib"},
+        {"id": "MagicLib", "name": "MagicLib"}
     ],
     "modPlugin": "smallersector.SmallerSectorModPlugin"
 }

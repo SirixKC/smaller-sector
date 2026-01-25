@@ -147,7 +147,51 @@ public class Settings {
         return val != null ? val.floatValue() : 2.0f;
     }
 
-    // Build/purchase cost multipliers
+    // Production time multipliers
+    public static float getGlobalProductionMult() {
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 1.0f;
+        if (PRESET_HARDCORE.equals(preset)) return 2.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "globalProductionMult");
+        return val != null ? val.floatValue() : 1.0f;
+    }
+
+    public static float getCruiserProductionMult() {
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 2.0f;
+        if (PRESET_HARDCORE.equals(preset)) return 4.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "cruiserProductionMult");
+        return val != null ? val.floatValue() : 2.0f;
+    }
+
+    public static float getCapitalProductionMult() {
+        String preset = getPreset();
+        if (PRESET_VANILLA.equals(preset)) return 1.0f;
+        if (PRESET_RECOMMENDED.equals(preset)) return 3.0f;
+        if (PRESET_HARDCORE.equals(preset)) return 6.0f;
+        // Custom
+        Double val = LunaSettings.getDouble(MOD_ID, "capitalProductionMult");
+        return val != null ? val.floatValue() : 3.0f;
+    }
+
+    public static float getProductionTimeMult(HullSize size) {
+        if (size == null) return 1.0f;
+        float globalMult = getGlobalProductionMult();
+        switch (size) {
+            case CRUISER:
+                return globalMult * getCruiserProductionMult();
+            case CAPITAL_SHIP:
+                return globalMult * getCapitalProductionMult();
+            default:
+                return globalMult;
+        }
+    }
+
+    // Build/production cost multipliers (affects base value)
     public static float getCruiserBuildCostMult() {
         String preset = getPreset();
         if (PRESET_VANILLA.equals(preset)) return 1.0f;

@@ -21,12 +21,10 @@ public class SmallerSectorCostMod extends BaseHullMod {
             if (index == 0) return String.format("%.1fx", Settings.getCruiserCrewMult());
             if (index == 1) return String.format("%.1fx", Settings.getCruiserSupplyMult());
             if (index == 2) return String.format("%.1fx", Settings.getCruiserFuelMult());
-            if (index == 3) return String.format("%.1fx", Settings.getCruiserBuildCostMult());
         } else if (hullSize == HullSize.CAPITAL_SHIP) {
             if (index == 0) return String.format("%.1fx", Settings.getCapitalCrewMult());
             if (index == 1) return String.format("%.1fx", Settings.getCapitalSupplyMult());
             if (index == 2) return String.format("%.1fx", Settings.getCapitalFuelMult());
-            if (index == 3) return String.format("%.1fx", Settings.getCapitalBuildCostMult());
         }
         return null;
     }
