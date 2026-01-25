@@ -22,7 +22,6 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
 
     private FleetSpawnListener fleetSpawnListener;
     private MarketInterceptor marketInterceptor;
-    private SalvageInterceptor salvageInterceptor;
     private DerelictInterceptor derelictInterceptor;
     private PlayerFleetMonitor playerFleetMonitor;
 
@@ -73,10 +72,6 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
         // Market/economy listener
         marketInterceptor = new MarketInterceptor();
         listeners.addListener(marketInterceptor, true);
-
-        // Salvage listener
-        salvageInterceptor = new SalvageInterceptor();
-        listeners.addListener(salvageInterceptor, true);
 
         // Derelict ship interceptor - replaces cruisers/capitals in derelicts
         derelictInterceptor = new DerelictInterceptor();
