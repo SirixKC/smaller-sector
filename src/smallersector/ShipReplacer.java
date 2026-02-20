@@ -20,6 +20,11 @@ public class ShipReplacer {
             return null;
         }
 
+        // Skip stations entirely — they should never be replaced
+        if (original.isStation()) {
+            return null;
+        }
+
         // Check faction blacklist
         if (Settings.isFactionBlacklisted(factionId)) {
             return null;

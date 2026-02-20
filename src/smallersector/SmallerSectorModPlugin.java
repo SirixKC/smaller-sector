@@ -138,6 +138,7 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
         if (member == null) return;
         if (member.getHullSpec() == null) return;
         if (member.getVariant() == null) return;
+        if (member.isStation()) return;
 
         HullSize size = member.getHullSpec().getHullSize();
         if (size != HullSize.CRUISER && size != HullSize.CAPITAL_SHIP) return;

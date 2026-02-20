@@ -61,6 +61,10 @@ public class DerelictInterceptor implements DiscoverEntityListener {
         }
 
         HullSize size = variant.getHullSize();
+        if (variant.getHullSpec() != null && variant.getHullSpec().getHints() != null
+                && variant.getHullSpec().getHints().contains(ShipHullSpecAPI.ShipTypeHints.STATION)) {
+            return; // Never process stations
+        }
         if (size != HullSize.CRUISER && size != HullSize.CAPITAL_SHIP) {
             return; // Only process cruisers and capitals
         }

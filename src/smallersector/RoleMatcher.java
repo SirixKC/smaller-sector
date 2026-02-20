@@ -222,9 +222,9 @@ public class RoleMatcher {
 
         for (String hullId : knownShips) {
             ShipHullSpecAPI hull = Global.getSettings().getHullSpec(hullId);
-            if (hull != null && hull.getHullSize() == size && !hull.isDefaultDHull()) {
-                result.add(hull);
-            }
+            if (hull == null || hull.getHullSize() != size || hull.isDefaultDHull()) continue;
+            if (hull.getHints() != null && hull.getHints().contains(ShipTypeHints.STATION)) continue;
+            result.add(hull);
         }
 
         return result;

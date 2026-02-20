@@ -27,6 +27,7 @@ public class FleetInterceptor implements FleetEventListener {
      */
     public static void processFleet(CampaignFleetAPI fleet) {
         if (fleet == null || fleet.getFaction() == null || fleet.getFleetData() == null) return;
+        if (fleet.isStationMode()) return;
 
         String factionId = fleet.getFaction().getId();
         List<FleetMemberAPI> toRemove = new ArrayList<FleetMemberAPI>();

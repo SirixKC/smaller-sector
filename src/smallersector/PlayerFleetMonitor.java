@@ -73,6 +73,7 @@ public class PlayerFleetMonitor implements EveryFrameScript {
     private void processNewShip(FleetMemberAPI member) {
         if (member.getHullSpec() == null) return;
         if (member.getVariant() == null) return;
+        if (member.isStation()) return;
 
         HullSize size = member.getHullSpec().getHullSize();
 
