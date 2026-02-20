@@ -7,13 +7,14 @@
     <property name="jar.name" value="SmallerSector.jar"/>
 
     <!-- Starsector installation path (native Linux install for core jars) -->
-    <property name="starsector.dir" value="${user.home}/Documents/Games/starsector"/>
+    <property name="starsector.dir" value="${user.home}/Games/starsector"/>
     <property name="starsector.core" value="${starsector.dir}"/>
 
     <!-- Mods directory -->
     <property name="mods.dir" value="${starsector.dir}/mods"/>
     <property name="lunalib.dir" value="${mods.dir}/LunaLib"/>
     <property name="lazylib.dir" value="${mods.dir}/LazyLib"/>
+    <property name="magiclib.dir" value="${mods.dir}/MagicLib"/>
 
     <path id="compile.classpath">
         <fileset dir="${starsector.core}">
@@ -27,6 +28,9 @@
             <include name="*.jar"/>
         </fileset>
         <fileset dir="${lazylib.dir}/jars" erroronmissingdir="false">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${magiclib.dir}/jars" erroronmissingdir="false">
             <include name="*.jar"/>
         </fileset>
     </path>

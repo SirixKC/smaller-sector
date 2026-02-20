@@ -1,11 +1,15 @@
 package smallersector;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.ModSpecAPI;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.InteractionDialogAPI;
 import com.fs.starfarer.api.campaign.InteractionDialogPlugin;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.combat.EngagementResultAPI;
+import com.fs.starfarer.api.combat.ShipAPI.HullSize;
+import com.fs.starfarer.api.combat.ShipHullSpecAPI;
+import com.fs.starfarer.api.loading.WithSourceMod;
 import com.fs.starfarer.api.util.Misc;
 import lunalib.lunaSettings.LunaSettings;
 import org.lazywizard.lazylib.JSONUtils;
@@ -25,7 +29,7 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
     private Set<String> currentBlacklist;
     private List<FactionAPI> allFactions;
     private int currentPage = 0;
-    private static final int FACTIONS_PER_PAGE = 8;
+    private static final int FACTIONS_PER_PAGE = 5;
 
     // Option IDs
     private static final String OPT_PREV_PAGE = "prev_page";
@@ -89,6 +93,9 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
         dialog.getTextPanel().addPara("", g);
 
         // Show factions for current page
+        Color factionColor = Misc.getBasePlayerColor();
+        Color modColor = Misc.getGrayColor();
+
         for (int i = startIndex; i < endIndex; i++) {
             FactionAPI faction = allFactions.get(i);
             boolean isBlacklisted = currentBlacklist.contains(faction.getId().toLowerCase());
@@ -96,10 +103,25 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
             String status = isBlacklisted ? "[BLACKLISTED]" : "[ACTIVE]";
             Color statusColor = isBlacklisted ? positive : negative;
 
+            // Faction name line with highlight
+            String factionName = faction.getDisplayName();
+            dialog.getTextPanel().addPara(factionName + " " + status, statusColor, factionColor, factionName);
+
+            // Mod source line
+            String modSource = getFactionModSource(faction);
+            dialog.getTextPanel().addPara("  Mod: %s", modColor, h, modSource);
+
+            // Ship counts line
+            Map<HullSize, Integer> counts = countShipsBySize(faction);
+            String countsLine = String.format("  F: %d | D: %d | Cr: %d | Cap: %d",
+                    counts.get(HullSize.FRIGATE),
+                    counts.get(HullSize.DESTROYER),
+                    counts.get(HullSize.CRUISER),
+                    counts.get(HullSize.CAPITAL_SHIP));
+            dialog.getTextPanel().addPara(countsLine, g);
+
             String optionText = faction.getDisplayName() + " - " + status;
             dialog.getOptionPanel().addOption(optionText, OPT_TOGGLE_PREFIX + faction.getId());
-
-            // Note: OptionPanelAPI doesn't support per-option colors, status shown in text
         }
 
         dialog.getOptionPanel().addOption("", "spacer1");
@@ -120,6 +142,41 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
         int blacklistCount = currentBlacklist.size();
         dialog.getOptionPanel().addOption("Save Changes (" + blacklistCount + " blacklisted)", OPT_SAVE);
         dialog.getOptionPanel().addOption("Cancel", OPT_CANCEL);
+    }
+
+    private Map<HullSize, Integer> countShipsBySize(FactionAPI faction) {
+        Map<HullSize, Integer> counts = new LinkedHashMap<>();
+        for (HullSize size : new HullSize[]{HullSize.FRIGATE, HullSize.DESTROYER, HullSize.CRUISER, HullSize.CAPITAL_SHIP}) {
+            counts.put(size, 0);
+        }
+        for (String hullId : faction.getKnownShips()) {
+            ShipHullSpecAPI hull = Global.getSettings().getHullSpec(hullId);
+            if (hull != null && !hull.isDefaultDHull()) {
+                HullSize size = hull.getHullSize();
+                if (counts.containsKey(size)) {
+                    counts.put(size, counts.get(size) + 1);
+                }
+            }
+        }
+        return counts;
+    }
+
+    private String getFactionModSource(FactionAPI faction) {
+        Map<String, Integer> modCounts = new HashMap<>();
+        for (String hullId : faction.getKnownShips()) {
+            ShipHullSpecAPI hull = Global.getSettings().getHullSpec(hullId);
+            if (hull instanceof WithSourceMod) {
+                ModSpecAPI mod = ((WithSourceMod) hull).getSourceMod();
+                if (mod != null) {
+                    String name = mod.getName();
+                    modCounts.put(name, modCounts.getOrDefault(name, 0) + 1);
+                }
+            }
+        }
+        return modCounts.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("Unknown");
     }
 
     @Override
