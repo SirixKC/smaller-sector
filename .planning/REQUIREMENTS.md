@@ -55,23 +55,23 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TABS-01 | — | Pending |
-| TABS-02 | — | Pending |
-| PRES-01 | — | Pending |
-| PRES-02 | — | Pending |
-| PRES-03 | — | Pending |
-| FACT-01 | — | Pending |
-| FACT-02 | — | Pending |
-| FACT-03 | — | Pending |
-| CLNP-01 | — | Pending |
-| CLNP-02 | — | Pending |
-| CLNP-03 | — | Pending |
+| TABS-01 | Phase 1 | Pending |
+| TABS-02 | Phase 1 | Pending |
+| PRES-01 | Phase 1 | Pending |
+| PRES-02 | Phase 1 | Pending |
+| PRES-03 | Phase 2 | Pending |
+| FACT-01 | Phase 3 | Pending |
+| FACT-02 | Phase 3 | Pending |
+| FACT-03 | Phase 3 | Pending |
+| CLNP-01 | Phase 1 | Pending |
+| CLNP-02 | Phase 2 | Pending |
+| CLNP-03 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11
+- Mapped to phases: 11
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-21 after initial definition*
+*Last updated: 2026-02-21 after roadmap creation*
