@@ -1,51 +1,47 @@
 fieldID,fieldName,fieldType,defaultValue,secondaryValue,fieldDescription,minValue,maxValue,tab
-header_preset,Preset,Header,Preset,,,,,
-preset,Difficulty Preset,Radio,Sirix Recommended,"Custom,Vanilla,Sirix Recommended,Sirix Hardcore",Select a preset to override all settings below. Choose Custom to use individual settings.,,,
-presetNote,IMPORTANT,Text,"[IMPORTANT:] THE SLIDERS BELOW ONLY HAVE AN EFFECT WHEN THE [CUSTOM] PRESET IS SELECTED. All other presets use their own hardcoded values.",,,,,
-,,,,,,,,
-header_cruiser,Cruiser Replacement,Header,Cruiser Replacement,,,,,
-cruiserToFrigate,Cruiser to Frigate,Int,30,,Percentage chance for cruisers to be replaced with frigates,0,100,
-cruiserToFrigatePresets,Presets,Text,"[Recommended: 30%% | Hardcore: 50%%]",,,,,
-cruiserToDestroyer,Cruiser to Destroyer,Int,50,,Percentage chance for cruisers to be replaced with destroyers,0,100,
-cruiserToDestroyerPresets,Presets,Text,"[Recommended: 50%% | Hardcore: 45%%]",,,,,
-,,,,,,,,
-header_capital,Capital Replacement,Header,Capital Replacement,,,,,
-capitalToFrigate,Capital to Frigate,Int,20,,Percentage chance for capitals to be replaced with frigates,0,100,
-capitalToFrigatePresets,Presets,Text,"[Recommended: 20%% | Hardcore: 40%%]",,,,,
-capitalToDestroyer,Capital to Destroyer,Int,40,,Percentage chance for capitals to be replaced with destroyers,0,100,
-capitalToDestroyerPresets,Presets,Text,"[Recommended: 40%% | Hardcore: 40%%]",,,,,
-capitalToCruiser,Capital to Cruiser,Int,25,,Percentage chance for capitals to be replaced with cruisers,0,100,
-capitalToCruiserPresets,Presets,Text,"[Recommended: 25%% | Hardcore: 18%%]",,,,,
-,,,,,,,,
-header_cost,Operating Cost Multipliers,Header,Operating Costs,,,,,
-cruiserCrewMult,Cruiser Crew Multiplier,Double,1.5,,Multiplier for cruiser minimum crew requirements,0.1,10,
-cruiserCrewMultPresets,Presets,Text,"[Recommended: 1.5x | Hardcore: 2.0x]",,,,,
-cruiserSupplyMult,Cruiser Supply Multiplier,Double,1.5,,Multiplier for cruiser supply costs,0.1,10,
-cruiserSupplyMultPresets,Presets,Text,"[Recommended: 1.5x | Hardcore: 3.0x]",,,,,
-cruiserFuelMult,Cruiser Fuel Multiplier,Double,1.5,,Multiplier for cruiser fuel consumption,0.1,10,
-cruiserFuelMultPresets,Presets,Text,"[Recommended: 1.5x | Hardcore: 3.0x]",,,,,
-capitalCrewMult,Capital Crew Multiplier,Double,2.0,,Multiplier for capital minimum crew requirements,0.1,10,
-capitalCrewMultPresets,Presets,Text,"[Recommended: 2.0x | Hardcore: 3.0x]",,,,,
-capitalSupplyMult,Capital Supply Multiplier,Double,2.0,,Multiplier for capital supply costs,0.1,10,
-capitalSupplyMultPresets,Presets,Text,"[Recommended: 2.0x | Hardcore: 4.0x]",,,,,
-capitalFuelMult,Capital Fuel Multiplier,Double,2.0,,Multiplier for capital fuel consumption,0.1,10,
-capitalFuelMultPresets,Presets,Text,"[Recommended: 2.0x | Hardcore: 4.0x]",,,,,
-,,,,,,,,
-header_build,Build Cost Multipliers,Header,Build Costs,,,,,
-cruiserBuildCostMult,Cruiser Build Cost Multiplier,Double,1.5,,Multiplier for cruiser base value (affects production and purchase cost),1.0,10.0,
-cruiserBuildCostMultPresets,Presets,Text,"[Recommended: 1.5x | Hardcore: 3.0x]",,,,,
-capitalBuildCostMult,Capital Build Cost Multiplier,Double,2.0,,Multiplier for capital base value (affects production and purchase cost),1.0,10.0,
-capitalBuildCostMultPresets,Presets,Text,"[Recommended: 2.0x | Hardcore: 5.0x]",,,,,
-,,,,,,,,
-header_dmod,D-Mod Penalties,Header,D-Mods,,,,,
-cruiserDmodCount,Cruiser D-Mods,Int,2,,Number of D-mods applied to cruisers built or acquired by the player,0,5,
-cruiserDmodCountPresets,Presets,Text,"[Recommended: 2 | Hardcore: 3]",,,,,
-capitalDmodCount,Capital D-Mods,Int,3,,Number of D-mods applied to capitals built or acquired by the player,0,5,
-capitalDmodCountPresets,Presets,Text,"[Recommended: 3 | Hardcore: 5]",,,,,
-,,,,,,,,
-header_blacklist,Faction Blacklist,Header,Blacklist,,,,,
-factionBlacklistInGame,In-Game Manager,Text,"[TIP:] Once in-game check your [Intel Screen] (Missions tab) for the [Faction Manager] - it lets you browse ALL loaded factions and toggle blacklist status with a single click!",,,,,
-factionBlacklistHelp,Note,Text,"Your custom blacklist entries below are ALWAYS applied regardless of preset. Sirix presets also include default AI/special factions.",,,,,
-factionBlacklistVanilla,Vanilla IDs,Text,"[Vanilla:] remnant | omega | derelict | pirates | hegemony | tritachyon | persean | sindrian_diktat | luddic_church | luddic_path | independent",,,,,
-factionBlacklistMods,Common Mod IDs,Text,"[Mods:] hmi_nightmare | mess | jdp_deadcomm | threat | rat_abyssals | sotf_dreaminggestalt | zea_elysians | zea_dusk | zea_dawn | khewarpedomega | ml_bounty | nex_derelict",,,,,
-factionBlacklist,Blacklisted Factions,String,,,"Factions listed here will NOT have their ships replaced. Use lowercase IDs separated by commas.",,,
+preset,Difficulty Preset,Radio,Sirix Recommended,"Custom,Vanilla,Sirix Recommended,Sirix Hardcore",Select a preset to override all settings. Choose Custom to use individual settings from the Configuration tab.,,,Presets
+ss_active_preset,Active Preset,String,">> Active: Sirix Recommended <<",,,,,Presets
+ss_header_comparison,Preset Comparison,Header,Preset Comparison,,,,,Presets
+ss_section_replacement,--- Ship Replacement ---,Text,--- Ship Replacement ---,,,,,Presets
+ss_van_replacement,Vanilla,Text,"Cruiser: Frigate [0%%] | Destroyer [0%%] | Stays [100%%]  //  Capital: Frigate [0%%] | Destroyer [0%%] | Cruiser [0%%] | Stays [100%%]",,,,,Presets
+ss_rec_replacement,Sirix Recommended,Text,"Cruiser: Frigate [30%%] | Destroyer [50%%] | Stays [20%%]  //  Capital: Frigate [20%%] | Destroyer [40%%] | Cruiser [25%%] | Stays [15%%]",,,,,Presets
+ss_hc_replacement,Sirix Hardcore,Text,"Cruiser: Frigate [50%%] | Destroyer [45%%] | Stays [5%%]  //  Capital: Frigate [40%%] | Destroyer [40%%] | Cruiser [18%%] | Stays [2%%]",,,,,Presets
+ss_cust_replacement,Custom,Text,Uses your configured values from the Configuration tab.,,,,,Presets
+ss_section_costs,--- Costs & Penalties ---,Text,--- Costs & Penalties ---,,,,,Presets
+ss_van_costs,Vanilla,Text,"Cruiser: Crew [1.0x] Supply [1.0x] Fuel [1.0x] Build [1.0x]  //  Capital: Crew [1.0x] Supply [1.0x] Fuel [1.0x] Build [1.0x]",,,,,Presets
+ss_rec_costs,Sirix Recommended,Text,"Cruiser: Crew [1.5x] Supply [1.5x] Fuel [1.5x] Build [1.5x]  //  Capital: Crew [2.0x] Supply [2.0x] Fuel [2.0x] Build [2.0x]",,,,,Presets
+ss_hc_costs,Sirix Hardcore,Text,"Cruiser: Crew [2.0x] Supply [3.0x] Fuel [3.0x] Build [3.0x]  //  Capital: Crew [3.0x] Supply [4.0x] Fuel [4.0x] Build [5.0x]",,,,,Presets
+ss_cust_costs,Custom,Text,Uses your configured values from the Configuration tab.,,,,,Presets
+ss_section_dmods,--- D-Mods ---,Text,--- D-Mods ---,,,,,Presets
+ss_van_dmods,Vanilla,Text,"Cruiser: [0] D-mods  //  Capital: [0] D-mods",,,,,Presets
+ss_rec_dmods,Sirix Recommended,Text,"Cruiser: [2] D-mods  //  Capital: [3] D-mods",,,,,Presets
+ss_hc_dmods,Sirix Hardcore,Text,"Cruiser: [3] D-mods  //  Capital: [5] D-mods",,,,,Presets
+ss_cust_dmods,Custom,Text,Uses your configured values from the Configuration tab.,,,,,Presets
+ss_config_note,Note,Text,"[NOTE:] Slider values below only apply when the [Custom] preset is selected on the [Presets] tab. Other presets use their own hardcoded values.",,,,,Configuration
+ss_load_preset,Load Preset as Starting Point,Radio,-- None --,"-- None --,Vanilla Values,Recommended Values,Hardcore Values","Select a preset to copy its values into the sliders below. Only works when Custom is the active preset.",,,Configuration
+ss_header_ship_replacement,Ship Replacement,Header,Ship Replacement,,,,,Configuration
+ss_sub_cruiser_repl,Cruiser,Text,Cruiser,,,,,Configuration
+cruiserToFrigate,Cruiser to Frigate,Int,30,,Percentage chance for cruisers to be replaced with frigates,0,100,Configuration
+cruiserToDestroyer,Cruiser to Destroyer,Int,50,,Percentage chance for cruisers to be replaced with destroyers,0,100,Configuration
+ss_cruiser_stays,Stays as Cruiser,Text,Remaining percentage stays as cruiser (auto-calculated from sliders above).,,,,,Configuration
+ss_sub_capital_repl,Capital,Text,Capital,,,,,Configuration
+capitalToFrigate,Capital to Frigate,Int,20,,Percentage chance for capitals to be replaced with frigates,0,100,Configuration
+capitalToDestroyer,Capital to Destroyer,Int,40,,Percentage chance for capitals to be replaced with destroyers,0,100,Configuration
+capitalToCruiser,Capital to Cruiser,Int,25,,Percentage chance for capitals to be replaced with cruisers,0,100,Configuration
+ss_capital_stays,Stays as Capital,Text,Remaining percentage stays as capital (auto-calculated from sliders above).,,,,,Configuration
+ss_header_costs_penalties,Costs & Penalties,Header,Costs & Penalties,,,,,Configuration
+ss_sub_cruiser_cost,Cruiser,Text,Cruiser,,,,,Configuration
+cruiserCrewMult,Cruiser Crew Multiplier,Double,1.5,,Multiplier for cruiser minimum crew requirements,0.1,10,Configuration
+cruiserSupplyMult,Cruiser Supply Multiplier,Double,1.5,,Multiplier for cruiser supply costs,0.1,10,Configuration
+cruiserFuelMult,Cruiser Fuel Multiplier,Double,1.5,,Multiplier for cruiser fuel consumption,0.1,10,Configuration
+cruiserBuildCostMult,Cruiser Build Cost Multiplier,Double,1.5,,Multiplier for cruiser base value (affects production and purchase cost),1.0,10.0,Configuration
+ss_sub_capital_cost,Capital,Text,Capital,,,,,Configuration
+capitalCrewMult,Capital Crew Multiplier,Double,2.0,,Multiplier for capital minimum crew requirements,0.1,10,Configuration
+capitalSupplyMult,Capital Supply Multiplier,Double,2.0,,Multiplier for capital supply costs,0.1,10,Configuration
+capitalFuelMult,Capital Fuel Multiplier,Double,2.0,,Multiplier for capital fuel consumption,0.1,10,Configuration
+capitalBuildCostMult,Capital Build Cost Multiplier,Double,2.0,,Multiplier for capital base value (affects production and purchase cost),1.0,10.0,Configuration
+cruiserDmodCount,Cruiser D-Mods,Int,2,,Number of D-mods applied to cruisers built or acquired by the player,0,5,Configuration
+capitalDmodCount,Capital D-Mods,Int,3,,Number of D-mods applied to capitals built or acquired by the player,0,5,Configuration
+ss_faction_guide,Faction Manager,Text,"[TIP:] Use the in-game [Faction Manager] to browse all loaded factions and toggle blacklist status. Open your [Intel Screen] (Missions tab) to find it.",,,,,Factions
+ss_faction_help,Note,Text,Your custom blacklist entries below are ALWAYS applied regardless of preset. Sirix presets also include default AI/special factions.,,,,,Factions
+factionBlacklist,Blacklisted Factions,String,,,"Factions listed here will NOT have their ships replaced. Use lowercase IDs separated by commas.",,,Factions
