@@ -28,11 +28,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Each preset's configured values are visible as read-only text summaries on the Presets tab, so the user can compare presets before committing
   4. Tabs have Header and Text separators that visually group related settings within each tab
   5. The duplicate `lunalib/LunaSettings.json` file is deleted and settings still load correctly from the CSV
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Restructure LunaSettings.csv into three-tab layout with preset summaries; delete LunaSettings.json
+- [ ] 01-02-PLAN.md — Add load-preset radio handler to PresetListener; human verification of complete UI
 
 ### Phase 2: Preset Switching and Custom Persistence
 **Goal**: Users can freely switch between presets without losing their custom values, and old inline annotations are gone
@@ -68,6 +68,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Tab Structure and Preset Display | 0/TBD | Not started | - |
+| 1. Tab Structure and Preset Display | 0/2 | Not started | - |
 | 2. Preset Switching and Custom Persistence | 0/TBD | Not started | - |
 | 3. Faction Management and Bugfixes | 0/TBD | Not started | - |
