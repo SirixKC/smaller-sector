@@ -9,6 +9,8 @@ import lunalib.backend.ui.settings.ChangedSetting;
 import lunalib.backend.ui.components.base.LunaUIBaseElement;
 import lunalib.backend.ui.components.LunaUITextFieldWithSlider;
 import lunalib.backend.ui.components.base.LunaUITextField;
+import lunalib.backend.ui.components.LunaUIRadioButton;
+import lunalib.backend.ui.components.base.LunaUIButton;
 import org.lazywizard.lazylib.JSONUtils;
 import org.lazywizard.lazylib.JSONUtils.CommonDataJSONObject;
 
@@ -109,6 +111,64 @@ public class PresetListener implements LunaSettingsListener {
         String currentPreset = LunaSettings.getString(MOD_ID, "preset");
         if (currentPreset == null) currentPreset = "Sirix Recommended";
 
+        // Update the active preset indicator on every save
+        updateActivePresetIndicator(currentPreset);
+
+        // Handle preset changes (existing logic)
+        handlePresetChange(currentPreset);
+
+        // Handle load-preset radio (new feature)
+        handleLoadPreset(currentPreset);
+    }
+
+    /**
+     * Updates the ss_active_preset String field to display the currently active preset.
+     * Runs on every save so the indicator is always current.
+     */
+    private void updateActivePresetIndicator(String currentPreset) {
+        try {
+            String activeLabel = ">> Active: " + currentPreset + " <<";
+
+            // Persist via JSON
+            CommonDataJSONObject data = JSONUtils.loadCommonJSON(
+                "LunaSettings/" + MOD_ID + ".json",
+                "data/config/LunaSettingsDefault.default"
+            );
+            if (data != null) {
+                data.put("ss_active_preset", activeLabel);
+                data.save();
+            }
+
+            // Reload in-memory settings
+            LunaSettingsLoader.INSTANCE.loadSettings(MOD_ID, true);
+
+            // Update the live UI element
+            List<LunaUIBaseElement> elements = LunaSettingsUISettingsPanel.Companion.getAddedElements();
+            for (LunaUIBaseElement element : elements) {
+                Object key = element.getKey();
+                if (!(key instanceof LunaSettingsData)) continue;
+
+                LunaSettingsData settingsData = (LunaSettingsData) key;
+                if (!MOD_ID.equals(settingsData.getModID())) continue;
+
+                if ("ss_active_preset".equals(settingsData.getFieldID())) {
+                    if (element instanceof LunaUITextField) {
+                        ((LunaUITextField<String>) element).setValue(activeLabel);
+                    }
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            com.fs.starfarer.api.Global.getLogger(this.getClass()).debug(
+                "Could not update active preset indicator: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Handles preset switching when the user changes the active preset radio.
+     * Preserves the original behavior: named presets override slider values.
+     */
+    private void handlePresetChange(String currentPreset) {
         // Only update other values if preset actually changed
         if (currentPreset.equals(lastPreset)) {
             lastPreset = currentPreset;
@@ -170,6 +230,126 @@ public class PresetListener implements LunaSettingsListener {
         } catch (Exception e) {
             com.fs.starfarer.api.Global.getLogger(this.getClass()).warn(
                 "Failed to apply preset: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Handles the load-preset radio on the Configuration tab.
+     * When a user selects a preset to load, copies that preset's values into
+     * the Custom sliders (excluding factionBlacklist), then resets the radio
+     * back to the sentinel "-- None --" value.
+     *
+     * Only works when the active preset is Custom.
+     */
+    private void handleLoadPreset(String currentPreset) {
+        try {
+            String loadPreset = LunaSettings.getString(MOD_ID, "ss_load_preset");
+
+            // Skip if no load action requested
+            if (loadPreset == null || loadPreset.isEmpty() || "-- None --".equals(loadPreset)) {
+                return;
+            }
+
+            // Determine which preset values to load
+            Map<String, Object> sourceValues;
+            switch (loadPreset) {
+                case "Vanilla Values":
+                    sourceValues = VANILLA_VALUES;
+                    break;
+                case "Recommended Values":
+                    sourceValues = RECOMMENDED_VALUES;
+                    break;
+                case "Hardcore Values":
+                    sourceValues = HARDCORE_VALUES;
+                    break;
+                default:
+                    resetLoadPresetRadio();
+                    return;
+            }
+
+            if ("Custom".equals(currentPreset)) {
+                // Filter out factionBlacklist - only copy numeric settings
+                Map<String, Object> filteredValues = new HashMap<>(sourceValues);
+                filteredValues.remove("factionBlacklist");
+
+                // Copy values into sliders
+                updateChangedSettings(filteredValues);
+                updateUIElements(filteredValues);
+
+                // Persist the copied values
+                CommonDataJSONObject data = JSONUtils.loadCommonJSON(
+                    "LunaSettings/" + MOD_ID + ".json",
+                    "data/config/LunaSettingsDefault.default"
+                );
+                if (data != null) {
+                    for (Map.Entry<String, Object> entry : filteredValues.entrySet()) {
+                        data.put(entry.getKey(), entry.getValue());
+                    }
+                    data.save();
+                }
+                LunaSettingsLoader.INSTANCE.loadSettings(MOD_ID, true);
+
+                com.fs.starfarer.api.Global.getLogger(this.getClass()).info(
+                    "Loaded " + loadPreset + " values into Custom sliders");
+            } else {
+                com.fs.starfarer.api.Global.getLogger(this.getClass()).warn(
+                    "Load preset ignored: active preset is not Custom");
+            }
+
+            // Always reset the radio back to sentinel (even if not Custom)
+            resetLoadPresetRadio();
+
+        } catch (Exception e) {
+            com.fs.starfarer.api.Global.getLogger(this.getClass()).warn(
+                "Failed to handle load preset: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Resets the ss_load_preset radio back to "-- None --" sentinel value.
+     * Updates JSON persistence, in-memory settings, and the live UI element.
+     */
+    private void resetLoadPresetRadio() {
+        try {
+            // 1. Update via JSON file
+            CommonDataJSONObject data = JSONUtils.loadCommonJSON(
+                "LunaSettings/" + MOD_ID + ".json",
+                "data/config/LunaSettingsDefault.default"
+            );
+            if (data != null) {
+                data.put("ss_load_preset", "-- None --");
+                data.save();
+            }
+
+            // 2. Reload in-memory settings
+            LunaSettingsLoader.INSTANCE.loadSettings(MOD_ID, true);
+
+            // 3. Update the live UI radio element
+            List<LunaUIBaseElement> elements = LunaSettingsUISettingsPanel.Companion.getAddedElements();
+            for (LunaUIBaseElement element : elements) {
+                Object key = element.getKey();
+                if (!(key instanceof LunaSettingsData)) continue;
+
+                LunaSettingsData settingsData = (LunaSettingsData) key;
+                if (!MOD_ID.equals(settingsData.getModID())) continue;
+
+                if ("ss_load_preset".equals(settingsData.getFieldID())) {
+                    if (element instanceof LunaUIRadioButton) {
+                        LunaUIRadioButton radio = (LunaUIRadioButton) element;
+                        radio.setValue("-- None --");
+                        for (LunaUIButton button : radio.getButtons()) {
+                            if ("-- None --".equals(button.getButtonText().getText())) {
+                                button.setSelected();
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            com.fs.starfarer.api.Global.getLogger(this.getClass()).debug(
+                "Could not reset load preset radio: " + e.getMessage());
         }
     }
 
