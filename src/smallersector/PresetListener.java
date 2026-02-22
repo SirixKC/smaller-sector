@@ -15,9 +15,11 @@ import org.lazywizard.lazylib.JSONUtils;
 import org.lazywizard.lazylib.JSONUtils.CommonDataJSONObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Listens for preset changes and updates all individual settings to match.
@@ -44,6 +46,24 @@ public class PresetListener implements LunaSettingsListener {
 
     // Track the last preset to detect changes
     private String lastPreset = null;
+
+    // Store original clean descriptions (without [Preset: ...] prefix) to prevent accumulation
+    private static final Map<String, String> cleanDescriptions = new HashMap<>();
+
+    // Set of all numeric setting IDs that should get description hints
+    private static final Set<String> NUMERIC_SETTING_IDS = new HashSet<>();
+    static {
+        for (String id : new String[]{
+            "cruiserToFrigate", "cruiserToDestroyer",
+            "capitalToFrigate", "capitalToDestroyer", "capitalToCruiser",
+            "cruiserDmodCount", "capitalDmodCount",
+            "cruiserCrewMult", "cruiserSupplyMult", "cruiserFuelMult",
+            "capitalCrewMult", "capitalSupplyMult", "capitalFuelMult",
+            "cruiserBuildCostMult", "capitalBuildCostMult"
+        }) {
+            NUMERIC_SETTING_IDS.add(id);
+        }
+    }
 
     // Preset values stored as maps for easy lookup
     private static final Map<String, Object> VANILLA_VALUES = new HashMap<>();
@@ -123,6 +143,9 @@ public class PresetListener implements LunaSettingsListener {
             );
         }
 
+        // Capture original clean descriptions before any rewriting (first call only)
+        captureCleanDescriptions();
+
         String currentPreset = LunaSettings.getString(MOD_ID, "preset");
         if (currentPreset == null) currentPreset = "Vanilla";
 
@@ -139,6 +162,9 @@ public class PresetListener implements LunaSettingsListener {
         if ("Custom".equals(currentPreset)) {
             backupCustomValues();
         }
+
+        // Update setting descriptions with [Preset: value] hints for the active preset
+        updateSettingDescriptions(currentPreset);
     }
 
     /**
@@ -534,6 +560,113 @@ public class PresetListener implements LunaSettingsListener {
             log.warn("Failed to load custom values backup: " + e.getMessage(), e);
         }
         return result;
+    }
+
+    /**
+     * Captures original clean descriptions from SettingsData for all numeric settings.
+     * Only captures once (first call) to avoid overwriting originals with already-prefixed descriptions.
+     */
+    private void captureCleanDescriptions() {
+        if (!cleanDescriptions.isEmpty()) return;
+        try {
+            List<LunaSettingsData> allData = LunaSettingsLoader.getSettingsData();
+            if (allData == null) return;
+            for (LunaSettingsData entry : allData) {
+                if (!MOD_ID.equals(entry.getModID())) continue;
+                String fieldId = entry.getFieldID();
+                if (NUMERIC_SETTING_IDS.contains(fieldId)) {
+                    cleanDescriptions.put(fieldId, entry.getFieldDescription());
+                }
+            }
+            if (!cleanDescriptions.isEmpty()) {
+                log.info("Captured clean descriptions for " + cleanDescriptions.size() + " settings");
+            }
+        } catch (Exception e) {
+            log.warn("Failed to capture clean descriptions: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Returns the preset values map for a given preset name, excluding factionBlacklist.
+     * Returns an empty map for "Custom" (no fixed values to hint).
+     */
+    private Map<String, Object> getPresetValuesForName(String presetName) {
+        Map<String, Object> source;
+        switch (presetName) {
+            case "Vanilla":
+                source = VANILLA_VALUES;
+                break;
+            case "Sirix Recommended":
+                source = RECOMMENDED_VALUES;
+                break;
+            case "Sirix Hardcore":
+                source = HARDCORE_VALUES;
+                break;
+            case "Custom":
+            default:
+                return new HashMap<>();
+        }
+        Map<String, Object> filtered = new HashMap<>(source);
+        filtered.remove("factionBlacklist");
+        return filtered;
+    }
+
+    /**
+     * Updates setting descriptions in SettingsData with [Preset: value] hints.
+     * Uses cleanDescriptions as the base to prevent prefix accumulation.
+     * For "Custom" preset, reverts to clean descriptions (no hints).
+     */
+    private void updateSettingDescriptions(String presetName) {
+        if (cleanDescriptions.isEmpty()) return;
+        try {
+            Map<String, Object> presetValues = getPresetValuesForName(presetName);
+            List<LunaSettingsData> allData = LunaSettingsLoader.getSettingsData();
+            if (allData == null) return;
+
+            for (int i = 0; i < allData.size(); i++) {
+                LunaSettingsData entry = allData.get(i);
+                if (!MOD_ID.equals(entry.getModID())) continue;
+
+                String fieldId = entry.getFieldID();
+                String cleanDesc = cleanDescriptions.get(fieldId);
+                if (cleanDesc == null) continue;
+
+                String newDescription;
+                if (presetValues.containsKey(fieldId)) {
+                    Object value = presetValues.get(fieldId);
+                    String formatted;
+                    if (value instanceof Integer) {
+                        formatted = value + "%";
+                    } else if (value instanceof Double) {
+                        formatted = String.format("%.1fx", (Double) value);
+                    } else {
+                        continue;
+                    }
+                    newDescription = "[Preset: " + formatted + "] " + cleanDesc;
+                } else {
+                    // Custom preset or setting not in preset map: use clean description
+                    newDescription = cleanDesc;
+                }
+
+                LunaSettingsData replacement = new LunaSettingsData(
+                    entry.getModID(),
+                    entry.getFieldID(),
+                    entry.getFieldName(),
+                    entry.getFieldType(),
+                    newDescription,
+                    entry.getDefaultValue(),
+                    entry.getSecondaryValue(),
+                    entry.getMinValue(),
+                    entry.getMaxValue(),
+                    entry.getTab()
+                );
+                allData.set(i, replacement);
+            }
+
+            log.info("Updated setting descriptions for preset: " + presetName);
+        } catch (Exception e) {
+            log.warn("Failed to update setting descriptions: " + e.getMessage(), e);
+        }
     }
 
     /**
