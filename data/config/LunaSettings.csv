@@ -1,5 +1,5 @@
 fieldID,fieldName,fieldType,defaultValue,secondaryValue,fieldDescription,minValue,maxValue,tab
-preset,Difficulty Preset,Radio,Sirix Recommended,"Custom,Vanilla,Sirix Recommended,Sirix Hardcore",Select a preset to override all settings. Choose Custom to use individual settings from the Configuration tab.,,,Presets
+preset,Difficulty Preset,Radio,Vanilla,"Custom,Vanilla,Sirix Recommended,Sirix Hardcore",Select a preset to override all settings. Choose Custom to use individual settings from the Configuration tab.,,,Presets
 ss_active_preset,Active Preset,String,">> Active: Sirix Recommended <<",,,,,Presets
 ss_header_comparison,Preset Comparison,Header,Preset Comparison,,,,,Presets
 ss_section_replacement,--- Ship Replacement ---,Text,--- Ship Replacement ---,,,,,Presets
@@ -18,7 +18,7 @@ ss_rec_dmods,Sirix Recommended,Text,"Cruiser: [2] D-mods  //  Capital: [3] D-mod
 ss_hc_dmods,Sirix Hardcore,Text,"Cruiser: [3] D-mods  //  Capital: [5] D-mods",,,,,Presets
 ss_cust_dmods,Custom,Text,Uses your configured values from the Configuration tab.,,,,,Presets
 ss_config_note,Note,Text,"[NOTE:] Slider values below only apply when the [Custom] preset is selected on the [Presets] tab. Other presets use their own hardcoded values.",,,,,Configuration
-ss_load_preset,Load Preset as Starting Point,Radio,-- None --,"-- None --,Vanilla Values,Recommended Values,Hardcore Values","Select a preset to copy its values into the sliders below. Only works when Custom is the active preset.",,,Configuration
+ss_load_preset,Load Preset as Starting Point,Radio,-- None --,"-- None --,Vanilla Values,Recommended Values,Hardcore Values,Restore Custom Values","Select a preset to copy its values into the sliders below. Only works when Custom is the active preset.",,,Configuration
 ss_header_ship_replacement,Ship Replacement,Header,Ship Replacement,,,,,Configuration
 ss_sub_cruiser_repl,Cruiser,Text,Cruiser,,,,,Configuration
 cruiserToFrigate,Cruiser to Frigate,Int,30,,Percentage chance for cruisers to be replaced with frigates,0,100,Configuration

@@ -22,7 +22,7 @@ public class Settings {
      */
     public static String getPreset() {
         String val = LunaSettings.getString(MOD_ID, "preset");
-        String result = val != null ? val : PRESET_RECOMMENDED;
+        String result = val != null ? val : PRESET_VANILLA;
         log.info("Settings.getPreset() = '" + result + "' (raw: " + val + ")");
         return result;
     }
