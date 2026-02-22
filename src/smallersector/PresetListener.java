@@ -26,6 +26,21 @@ import java.util.Map;
 public class PresetListener implements LunaSettingsListener {
 
     private static final String MOD_ID = "smallersector";
+    private static final org.apache.log4j.Logger log = com.fs.starfarer.api.Global.getLogger(PresetListener.class);
+
+    private static final String BACKUP_FILE = "SmallerSectorCustomBackup.json";
+
+    private static final String[] BACKUP_SETTINGS_INT = {
+        "cruiserToFrigate", "cruiserToDestroyer",
+        "capitalToFrigate", "capitalToDestroyer", "capitalToCruiser",
+        "cruiserDmodCount", "capitalDmodCount"
+    };
+
+    private static final String[] BACKUP_SETTINGS_DOUBLE = {
+        "cruiserCrewMult", "cruiserSupplyMult", "cruiserFuelMult",
+        "capitalCrewMult", "capitalSupplyMult", "capitalFuelMult",
+        "cruiserBuildCostMult", "capitalBuildCostMult"
+    };
 
     // Track the last preset to detect changes
     private String lastPreset = null;
@@ -109,7 +124,7 @@ public class PresetListener implements LunaSettingsListener {
         }
 
         String currentPreset = LunaSettings.getString(MOD_ID, "preset");
-        if (currentPreset == null) currentPreset = "Sirix Recommended";
+        if (currentPreset == null) currentPreset = "Vanilla";
 
         // Update the active preset indicator on every save
         updateActivePresetIndicator(currentPreset);
@@ -119,6 +134,11 @@ public class PresetListener implements LunaSettingsListener {
 
         // Handle load-preset radio (new feature)
         handleLoadPreset(currentPreset);
+
+        // Backup custom values when saving with Custom preset active
+        if ("Custom".equals(currentPreset)) {
+            backupCustomValues();
+        }
     }
 
     /**
@@ -262,6 +282,33 @@ public class PresetListener implements LunaSettingsListener {
                 case "Hardcore Values":
                     sourceValues = HARDCORE_VALUES;
                     break;
+                case "Restore Custom Values":
+                    if ("Custom".equals(currentPreset)) {
+                        Map<String, Object> restoredValues = loadBackupValues();
+                        if (!restoredValues.isEmpty()) {
+                            updateChangedSettings(restoredValues);
+                            updateUIElements(restoredValues);
+                            // Persist to LunaSettings JSON
+                            CommonDataJSONObject data = JSONUtils.loadCommonJSON(
+                                "LunaSettings/" + MOD_ID + ".json",
+                                "data/config/LunaSettingsDefault.default"
+                            );
+                            if (data != null) {
+                                for (Map.Entry<String, Object> entry : restoredValues.entrySet()) {
+                                    data.put(entry.getKey(), entry.getValue());
+                                }
+                                data.save();
+                            }
+                            LunaSettingsLoader.INSTANCE.loadSettings(MOD_ID, true);
+                            log.info("Restored custom values from backup");
+                        } else {
+                            log.info("No custom values backup found -- restore skipped");
+                        }
+                    } else {
+                        log.info("Restore ignored: active preset is not Custom");
+                    }
+                    resetLoadPresetRadio();
+                    return;
                 default:
                     resetLoadPresetRadio();
                     return;
@@ -422,6 +469,82 @@ public class PresetListener implements LunaSettingsListener {
         } catch (Exception e) {
             com.fs.starfarer.api.Global.getLogger(this.getClass()).debug(
                 "Could not update UI elements: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Backs up all custom numeric setting values to a common JSON file.
+     * Called when the user saves settings with the Custom preset active.
+     * Excludes factionBlacklist (user decision: blacklist is independent of presets).
+     */
+    private void backupCustomValues() {
+        try {
+            CommonDataJSONObject backup = JSONUtils.loadCommonJSON(BACKUP_FILE);
+            for (String key : BACKUP_SETTINGS_INT) {
+                Integer val = LunaSettings.getInt(MOD_ID, key);
+                if (val != null) {
+                    backup.put(key, val);
+                }
+            }
+            for (String key : BACKUP_SETTINGS_DOUBLE) {
+                Double val = LunaSettings.getDouble(MOD_ID, key);
+                if (val != null) {
+                    backup.put(key, val);
+                }
+            }
+            backup.save();
+            log.info("Backed up custom values to " + BACKUP_FILE);
+        } catch (Exception e) {
+            log.warn("Failed to backup custom values: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Loads previously backed-up custom values from the common JSON file.
+     * Returns an empty map if no backup exists or the backup is empty.
+     * Per-key error handling ensures new settings not in the backup are simply skipped
+     * (they keep their current values).
+     */
+    private Map<String, Object> loadBackupValues() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            CommonDataJSONObject backup = JSONUtils.loadCommonJSON(BACKUP_FILE);
+            if (backup == null || backup.length() == 0) {
+                return result;
+            }
+            for (String key : BACKUP_SETTINGS_INT) {
+                try {
+                    if (backup.has(key)) {
+                        result.put(key, backup.getInt(key));
+                    }
+                } catch (Exception e) {
+                    log.debug("Skipping backup key " + key + ": " + e.getMessage());
+                }
+            }
+            for (String key : BACKUP_SETTINGS_DOUBLE) {
+                try {
+                    if (backup.has(key)) {
+                        result.put(key, backup.getDouble(key));
+                    }
+                } catch (Exception e) {
+                    log.debug("Skipping backup key " + key + ": " + e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Failed to load custom values backup: " + e.getMessage(), e);
+        }
+        return result;
+    }
+
+    /**
+     * Checks whether a custom values backup exists and is non-empty.
+     */
+    private boolean hasBackup() {
+        try {
+            CommonDataJSONObject backup = JSONUtils.loadCommonJSON(BACKUP_FILE);
+            return backup != null && backup.length() > 0;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
