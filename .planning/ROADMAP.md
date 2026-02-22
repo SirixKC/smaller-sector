@@ -12,7 +12,7 @@ This roadmap delivers a tabbed LunaLib settings UI for the Smaller Sector mod in
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Tab Structure and Preset Display** - Restructure settings into tabs with preset radio selector and value summaries
+- [x] **Phase 1: Tab Structure and Preset Display** - Restructure settings into tabs with preset radio selector and value summaries
 - [ ] **Phase 2: Preset Switching and Custom Persistence** - Custom value backup/restore across preset switches
 - [ ] **Phase 3: Faction Management and Bugfixes** - Faction tab content, dialog improvements, blacklist-preset decoupling
 
