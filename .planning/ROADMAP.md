@@ -42,10 +42,11 @@ Plans:
   1. User sets custom slider values, switches to a named preset (e.g., Sirix Recommended), then switches back to Custom — all custom values are restored exactly as they were
   2. Custom values survive across game restarts (persisted to disk, not just in-memory)
   3. Old inline preset annotation text (e.g., `[Recommended: 30%]`) no longer appears next to settings sliders
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Custom value backup/restore via JSONUtils with Restore radio option; Vanilla default preset
+- [ ] 02-02-PLAN.md — Dynamic [Preset: value] description hints via LunaSettingsData replacement; human verification
 
 ### Phase 3: Faction Management and Bugfixes
 **Goal**: Users can discover and manage per-faction ship replacement from both the Luna settings Factions tab and the improved in-game dialog
@@ -69,5 +70,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Tab Structure and Preset Display | 2/2 | Complete | 2026-02-21 |
-| 2. Preset Switching and Custom Persistence | 0/TBD | Not started | - |
+| 2. Preset Switching and Custom Persistence | 0/2 | Not started | - |
 | 3. Faction Management and Bugfixes | 0/TBD | Not started | - |
