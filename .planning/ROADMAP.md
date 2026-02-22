@@ -31,8 +31,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Restructure LunaSettings.csv into three-tab layout with preset summaries; delete LunaSettings.json
-- [ ] 01-02-PLAN.md — Add load-preset radio handler to PresetListener; human verification of complete UI
+- [x] 01-01-PLAN.md — Restructure LunaSettings.csv into three-tab layout with preset summaries; delete LunaSettings.json
+- [x] 01-02-PLAN.md — Add load-preset radio handler to PresetListener; human verification of complete UI
 
 ### Phase 2: Preset Switching and Custom Persistence
 **Goal**: Users can freely switch between presets without losing their custom values, and old inline annotations are gone
@@ -68,6 +68,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Tab Structure and Preset Display | 0/2 | Not started | - |
+| 1. Tab Structure and Preset Display | 2/2 | Complete | 2026-02-21 |
 | 2. Preset Switching and Custom Persistence | 0/TBD | Not started | - |
 | 3. Faction Management and Bugfixes | 0/TBD | Not started | - |
