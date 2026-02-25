@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Tab Structure and Preset Display** - Restructure settings into tabs with preset radio selector and value summaries
 - [x] **Phase 2: Preset Switching and Custom Persistence** - Custom value backup/restore across preset switches
-- [ ] **Phase 3: Faction Management and Bugfixes** - Faction tab content, dialog improvements, blacklist-preset decoupling
+- [x] **Phase 3: Faction Management and Bugfixes** - Faction tab content, dialog improvements, blacklist-preset decoupling
 
 ## Phase Details
 
@@ -60,7 +60,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 03-01-PLAN.md — Fix preset-override bug in saveBlacklist, improve dialog display (source ID, station filtering, affected counts)
+- [x] 03-01-PLAN.md — Fix preset-override bug in saveBlacklist, improve dialog display (source ID, station filtering, affected counts)
 
 ## Progress
 
@@ -71,4 +71,4 @@ Phases execute in numeric order: 1 -> 2 -> 3
 |-------|----------------|--------|-----------|
 | 1. Tab Structure and Preset Display | 2/2 | Complete | 2026-02-21 |
 | 2. Preset Switching and Custom Persistence | 2/2 | Complete | 2026-02-24 |
-| 3. Faction Management and Bugfixes | 0/1 | Not started | - |
+| 3. Faction Management and Bugfixes | 1/1 | Complete | 2026-02-25 |
