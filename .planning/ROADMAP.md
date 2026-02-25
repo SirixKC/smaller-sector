@@ -57,10 +57,10 @@ Plans:
   2. Factions tab contains the comma-separated blacklist string as an advanced fallback for users who want to edit it directly
   3. In-game FactionManagerDialog shows each faction's source mod (or "Vanilla") and ship counts affected by replacement
   4. Toggling a faction in the in-game dialog no longer silently switches the user's active preset to Custom
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Fix preset-override bug in saveBlacklist, improve dialog display (source ID, station filtering, affected counts)
 
 ## Progress
 
@@ -71,4 +71,4 @@ Phases execute in numeric order: 1 -> 2 -> 3
 |-------|----------------|--------|-----------|
 | 1. Tab Structure and Preset Display | 2/2 | Complete | 2026-02-21 |
 | 2. Preset Switching and Custom Persistence | 2/2 | Complete | 2026-02-24 |
-| 3. Faction Management and Bugfixes | 0/TBD | Not started | - |
+| 3. Faction Management and Bugfixes | 0/1 | Not started | - |
