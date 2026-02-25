@@ -3,20 +3,26 @@ preset,Difficulty Preset,Radio,Vanilla,"Custom,Vanilla,Sirix Recommended,Sirix H
 ss_active_preset,Active Preset,String,">> Active: Sirix Recommended <<",,,,,Presets
 ss_header_comparison,Preset Comparison,Header,Preset Comparison,,,,,Presets
 ss_section_replacement,--- Ship Replacement ---,Text,--- Ship Replacement ---,,,,,Presets
-ss_van_replacement,Vanilla,Text,"Cruiser: Frigate [0%%] | Destroyer [0%%] | Stays [100%%]  //  Capital: Frigate [0%%] | Destroyer [0%%] | Cruiser [0%%] | Stays [100%%]",,,,,Presets
-ss_rec_replacement,Sirix Recommended,Text,"Cruiser: Frigate [30%%] | Destroyer [50%%] | Stays [20%%]  //  Capital: Frigate [20%%] | Destroyer [40%%] | Cruiser [25%%] | Stays [15%%]",,,,,Presets
-ss_hc_replacement,Sirix Hardcore,Text,"Cruiser: Frigate [50%%] | Destroyer [45%%] | Stays [5%%]  //  Capital: Frigate [40%%] | Destroyer [40%%] | Cruiser [18%%] | Stays [2%%]",,,,,Presets
-ss_cust_replacement,Custom,Text,Uses your configured values from the Configuration tab.,,,,,Presets
+ss_repl_c2f,Cruiser to Frigate,Text,"Van [0%%] | Rec [30%%] | HC [50%%]",,,,,Presets
+ss_repl_c2d,Cruiser to Destroyer,Text,"Van [0%%] | Rec [50%%] | HC [45%%]",,,,,Presets
+ss_repl_c_stays,Cruiser Stays,Text,"Van [100%%] | Rec [20%%] | HC [5%%]",,,,,Presets
+ss_repl_k2f,Capital to Frigate,Text,"Van [0%%] | Rec [20%%] | HC [40%%]",,,,,Presets
+ss_repl_k2d,Capital to Destroyer,Text,"Van [0%%] | Rec [40%%] | HC [40%%]",,,,,Presets
+ss_repl_k2c,Capital to Cruiser,Text,"Van [0%%] | Rec [25%%] | HC [18%%]",,,,,Presets
+ss_repl_k_stays,Capital Stays,Text,"Van [100%%] | Rec [15%%] | HC [2%%]",,,,,Presets
 ss_section_costs,--- Costs & Penalties ---,Text,--- Costs & Penalties ---,,,,,Presets
-ss_van_costs,Vanilla,Text,"Cruiser: Crew [1.0x] Supply [1.0x] Fuel [1.0x] Build [1.0x]  //  Capital: Crew [1.0x] Supply [1.0x] Fuel [1.0x] Build [1.0x]",,,,,Presets
-ss_rec_costs,Sirix Recommended,Text,"Cruiser: Crew [1.5x] Supply [1.5x] Fuel [1.5x] Build [1.5x]  //  Capital: Crew [2.0x] Supply [2.0x] Fuel [2.0x] Build [2.0x]",,,,,Presets
-ss_hc_costs,Sirix Hardcore,Text,"Cruiser: Crew [2.0x] Supply [3.0x] Fuel [3.0x] Build [3.0x]  //  Capital: Crew [3.0x] Supply [4.0x] Fuel [4.0x] Build [5.0x]",,,,,Presets
-ss_cust_costs,Custom,Text,Uses your configured values from the Configuration tab.,,,,,Presets
+ss_cost_c_crew,Cruiser Crew,Text,"Van [1.0x] | Rec [1.5x] | HC [2.0x]",,,,,Presets
+ss_cost_c_supply,Cruiser Supply,Text,"Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
+ss_cost_c_fuel,Cruiser Fuel,Text,"Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
+ss_cost_c_build,Cruiser Build Cost,Text,"Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
+ss_cost_k_crew,Capital Crew,Text,"Van [1.0x] | Rec [2.0x] | HC [3.0x]",,,,,Presets
+ss_cost_k_supply,Capital Supply,Text,"Van [1.0x] | Rec [2.0x] | HC [4.0x]",,,,,Presets
+ss_cost_k_fuel,Capital Fuel,Text,"Van [1.0x] | Rec [2.0x] | HC [4.0x]",,,,,Presets
+ss_cost_k_build,Capital Build Cost,Text,"Van [1.0x] | Rec [2.0x] | HC [5.0x]",,,,,Presets
 ss_section_dmods,--- D-Mods ---,Text,--- D-Mods ---,,,,,Presets
-ss_van_dmods,Vanilla,Text,"Cruiser: [0] D-mods  //  Capital: [0] D-mods",,,,,Presets
-ss_rec_dmods,Sirix Recommended,Text,"Cruiser: [2] D-mods  //  Capital: [3] D-mods",,,,,Presets
-ss_hc_dmods,Sirix Hardcore,Text,"Cruiser: [3] D-mods  //  Capital: [5] D-mods",,,,,Presets
-ss_cust_dmods,Custom,Text,Uses your configured values from the Configuration tab.,,,,,Presets
+ss_dmod_cruiser,Cruiser D-Mods,Text,"Van [0] | Rec [2] | HC [3]",,,,,Presets
+ss_dmod_capital,Capital D-Mods,Text,"Van [0] | Rec [3] | HC [5]",,,,,Presets
+ss_cust_note,Custom,Text,Uses your configured values from the Configuration tab.,,,,,Presets
 ss_config_note,Note,Text,"[NOTE:] Slider values below only apply when the [Custom] preset is selected on the [Presets] tab. Other presets use their own hardcoded values.",,,,,Configuration
 ss_load_preset,Load Preset as Starting Point,Radio,-- None --,"-- None --,Vanilla Values,Recommended Values,Hardcore Values,Restore Custom Values","Select a preset to copy its values into the sliders below. Only works when Custom is the active preset.",,,Configuration
 ss_header_ship_replacement,Ship Replacement,Header,Ship Replacement,,,,,Configuration
