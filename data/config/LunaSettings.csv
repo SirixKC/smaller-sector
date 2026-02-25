@@ -3,25 +3,25 @@ preset,Difficulty Preset,Radio,Vanilla,"Custom,Vanilla,Sirix Recommended,Sirix H
 ss_active_preset,Active Preset,String,">> Active: Sirix Recommended <<",,,,,Presets
 ss_header_comparison,Preset Comparison,Header,Preset Comparison,,,,,Presets
 ss_section_replacement,--- Ship Replacement ---,Text,--- Ship Replacement ---,,,,,Presets
-ss_repl_c2f,Cruiser to Frigate,Text,"Van [0%%] | Rec [30%%] | HC [50%%]",,,,,Presets
-ss_repl_c2d,Cruiser to Destroyer,Text,"Van [0%%] | Rec [50%%] | HC [45%%]",,,,,Presets
-ss_repl_c_stays,Cruiser Stays,Text,"Van [100%%] | Rec [20%%] | HC [5%%]",,,,,Presets
-ss_repl_k2f,Capital to Frigate,Text,"Van [0%%] | Rec [20%%] | HC [40%%]",,,,,Presets
-ss_repl_k2d,Capital to Destroyer,Text,"Van [0%%] | Rec [40%%] | HC [40%%]",,,,,Presets
-ss_repl_k2c,Capital to Cruiser,Text,"Van [0%%] | Rec [25%%] | HC [18%%]",,,,,Presets
-ss_repl_k_stays,Capital Stays,Text,"Van [100%%] | Rec [15%%] | HC [2%%]",,,,,Presets
+ss_repl_c2f,Cruiser to Frigate,Text,"Cruiser→Frigate: Van [0%%] | Rec [30%%] | HC [50%%]",,,,,Presets
+ss_repl_c2d,Cruiser to Destroyer,Text,"Cruiser→Destroyer: Van [0%%] | Rec [50%%] | HC [45%%]",,,,,Presets
+ss_repl_c_stays,Cruiser Stays,Text,"Cruiser Stays: Van [100%%] | Rec [20%%] | HC [5%%]",,,,,Presets
+ss_repl_k2f,Capital to Frigate,Text,"Capital→Frigate: Van [0%%] | Rec [20%%] | HC [40%%]",,,,,Presets
+ss_repl_k2d,Capital to Destroyer,Text,"Capital→Destroyer: Van [0%%] | Rec [40%%] | HC [40%%]",,,,,Presets
+ss_repl_k2c,Capital to Cruiser,Text,"Capital→Cruiser: Van [0%%] | Rec [25%%] | HC [18%%]",,,,,Presets
+ss_repl_k_stays,Capital Stays,Text,"Capital Stays: Van [100%%] | Rec [15%%] | HC [2%%]",,,,,Presets
 ss_section_costs,--- Costs & Penalties ---,Text,--- Costs & Penalties ---,,,,,Presets
-ss_cost_c_crew,Cruiser Crew,Text,"Van [1.0x] | Rec [1.5x] | HC [2.0x]",,,,,Presets
-ss_cost_c_supply,Cruiser Supply,Text,"Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
-ss_cost_c_fuel,Cruiser Fuel,Text,"Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
-ss_cost_c_build,Cruiser Build Cost,Text,"Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
-ss_cost_k_crew,Capital Crew,Text,"Van [1.0x] | Rec [2.0x] | HC [3.0x]",,,,,Presets
-ss_cost_k_supply,Capital Supply,Text,"Van [1.0x] | Rec [2.0x] | HC [4.0x]",,,,,Presets
-ss_cost_k_fuel,Capital Fuel,Text,"Van [1.0x] | Rec [2.0x] | HC [4.0x]",,,,,Presets
-ss_cost_k_build,Capital Build Cost,Text,"Van [1.0x] | Rec [2.0x] | HC [5.0x]",,,,,Presets
+ss_cost_c_crew,Cruiser Crew,Text,"Cruiser Crew: Van [1.0x] | Rec [1.5x] | HC [2.0x]",,,,,Presets
+ss_cost_c_supply,Cruiser Supply,Text,"Cruiser Supply: Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
+ss_cost_c_fuel,Cruiser Fuel,Text,"Cruiser Fuel: Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
+ss_cost_c_build,Cruiser Build Cost,Text,"Cruiser Build: Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
+ss_cost_k_crew,Capital Crew,Text,"Capital Crew: Van [1.0x] | Rec [2.0x] | HC [3.0x]",,,,,Presets
+ss_cost_k_supply,Capital Supply,Text,"Capital Supply: Van [1.0x] | Rec [2.0x] | HC [4.0x]",,,,,Presets
+ss_cost_k_fuel,Capital Fuel,Text,"Capital Fuel: Van [1.0x] | Rec [2.0x] | HC [4.0x]",,,,,Presets
+ss_cost_k_build,Capital Build Cost,Text,"Capital Build: Van [1.0x] | Rec [2.0x] | HC [5.0x]",,,,,Presets
 ss_section_dmods,--- D-Mods ---,Text,--- D-Mods ---,,,,,Presets
-ss_dmod_cruiser,Cruiser D-Mods,Text,"Van [0] | Rec [2] | HC [3]",,,,,Presets
-ss_dmod_capital,Capital D-Mods,Text,"Van [0] | Rec [3] | HC [5]",,,,,Presets
+ss_dmod_cruiser,Cruiser D-Mods,Text,"Cruiser D-Mods: Van [0] | Rec [2] | HC [3]",,,,,Presets
+ss_dmod_capital,Capital D-Mods,Text,"Capital D-Mods: Van [0] | Rec [3] | HC [5]",,,,,Presets
 ss_cust_note,Custom,Text,Uses your configured values from the Configuration tab.,,,,,Presets
 ss_config_note,Note,Text,"[NOTE:] Slider values below only apply when the [Custom] preset is selected on the [Presets] tab. Other presets use their own hardcoded values.",,,,,Configuration
 ss_load_preset,Load Preset as Starting Point,Radio,-- None --,"-- None --,Vanilla Values,Recommended Values,Hardcore Values,Restore Custom Values","Select a preset to copy its values into the sliders below. Only works when Custom is the active preset.",,,Configuration
