@@ -11,6 +11,7 @@ import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.loading.WithSourceMod;
 import com.fs.starfarer.api.util.Misc;
+import lunalib.backend.ui.settings.LunaSettingsLoader;
 import lunalib.lunaSettings.LunaSettings;
 import org.lazywizard.lazylib.JSONUtils;
 
@@ -230,13 +231,14 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
 
             if (data != null) {
                 data.put("factionBlacklist", blacklistString);
-
-                // Also set preset to Custom since user is manually editing
-                data.put("preset", "Custom");
+                // Blacklist is preset-independent — no preset override
                 data.save();
             }
 
-            // Reload settings
+            // Reload LunaLib in-memory settings so Factions tab shows updated blacklist
+            LunaSettingsLoader.INSTANCE.loadSettings(MOD_ID, true);
+
+            // Reload mod's internal blacklist cache
             Settings.reloadBlacklist();
 
             Global.getSector().getCampaignUI().addMessage(
