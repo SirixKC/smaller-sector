@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** Users can quickly understand and switch between presets, customize individual values when needed, and manage per-faction ship replacement — all from a clean, tabbed Luna settings UI.
-**Current focus:** Phase 2 — Preset Switching and Custom Persistence (complete)
+**Current focus:** Phase 3 — Faction Management and Bugfixes (complete)
 
 ## Current Position
 
-Phase: 2 of 3 (Preset Switching and Custom Persistence)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-24 — Completed 02-02-PLAN.md (Dynamic Description Hints + Human Verification)
+Phase: 3 of 3 (Faction Management and Bugfixes)
+Plan: 1 of 1 in current phase
+Status: Project complete
+Last activity: 2026-02-25 — Completed 03-01-PLAN.md (Faction Dialog Bugfix and Display Improvements)
 
-Progress: [##########] 4/4 plans
+Progress: [##########] 5/5 plans
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 4 min
-- Total execution time: 17 min
+- Total execution time: 19 min
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [##########] 4/4 plans
 |-------|-------|-------|----------|
 | 01-tab-structure-and-preset-display | 2/2 | 7 min | 3.5 min |
 | 02-preset-switching-and-custom-persistence | 2/2 | 10 min | 5 min |
+| 03-faction-management-and-bugfixes | 1/1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min), 01-02 (4 min), 02-01 (2 min), 02-02 (8 min)
-- Trend: stable (02-02 longer due to human verification + user-requested CSV reformat)
+- Last 5 plans: 01-01 (3 min), 01-02 (4 min), 02-01 (2 min), 02-02 (8 min), 03-01 (2 min)
+- Trend: stable (03-01 fast — focused bugfix + display improvements, single file)
 
 *Updated after each plan completion*
 
@@ -58,6 +59,8 @@ Recent decisions affecting current work:
 - [02-02]: Clean descriptions captured on first settingsChanged (not at construction time)
 - [02-02]: Custom preset shows clean descriptions without [Preset: ...] prefix
 - [02-02]: Preset comparison uses self-labeled per-setting rows (Van/Rec/HC) instead of columnar table
+- [03-01]: Removed instanceof WithSourceMod — ShipHullSpecAPI already extends it, direct call is cleaner
+- [03-01]: Null source mod counted as "Vanilla" instead of skipped — vanilla factions show correct source
 
 ### Pending Todos
 
@@ -71,6 +74,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-24
-Stopped at: Phase 2 complete (all 2 plans executed and verified), ready for Phase 3
+Last session: 2026-02-25
+Stopped at: Project complete — all 3 phases (5 plans) executed and verified
 Resume file: None
