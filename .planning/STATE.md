@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** Users can quickly understand and switch between presets, customize individual values when needed, and manage per-faction ship replacement — all from a clean, tabbed Luna settings UI.
-**Current focus:** Phase 2 — Preset Switching and Custom Persistence (in progress)
+**Current focus:** Phase 2 — Preset Switching and Custom Persistence (complete)
 
 ## Current Position
 
 Phase: 2 of 3 (Preset Switching and Custom Persistence)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-22 — Completed 02-01-PLAN.md (Custom Value Backup/Restore)
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-24 — Completed 02-02-PLAN.md (Dynamic Description Hints + Human Verification)
 
-Progress: [########..] 3/4 plans
+Progress: [##########] 4/4 plans
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 3 min
-- Total execution time: 9 min
+- Total plans completed: 4
+- Average duration: 4 min
+- Total execution time: 17 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-tab-structure-and-preset-display | 2/2 | 7 min | 3.5 min |
-| 02-preset-switching-and-custom-persistence | 1/2 | 2 min | 2 min |
+| 02-preset-switching-and-custom-persistence | 2/2 | 10 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min), 01-02 (4 min), 02-01 (2 min)
-- Trend: improving
+- Last 5 plans: 01-01 (3 min), 01-02 (4 min), 02-01 (2 min), 02-02 (8 min)
+- Trend: stable (02-02 longer due to human verification + user-requested CSV reformat)
 
 *Updated after each plan completion*
 
@@ -51,10 +51,13 @@ Recent decisions affecting current work:
 - [01-02]: factionBlacklist excluded from load-preset copy to avoid overwriting user's custom blacklist
 - [01-02]: Radio always resets to sentinel even when active preset is not Custom
 - [02-01]: Vanilla is the default preset for new installs (not Sirix Recommended)
-- [02-01]: Backup only triggers when Custom preset is active on save (prevents overwriting custom backup with preset values)
-- [02-01]: Restore is an explicit user action via radio option, not automatic on switching to Custom
-- [02-01]: factionBlacklist excluded from backup (consistent with Phase 1 exclusion from preset loading)
-- [02-01]: Per-key error handling in loadBackupValues for forward compatibility with new settings
+- [02-01]: Backup only triggers when Custom preset is active on save
+- [02-01]: Restore is explicit user action via radio option, not automatic on switching to Custom
+- [02-01]: factionBlacklist excluded from backup (consistent with Phase 1 exclusion)
+- [02-01]: Per-key error handling in loadBackupValues for forward compatibility
+- [02-02]: Clean descriptions captured on first settingsChanged (not at construction time)
+- [02-02]: Custom preset shows clean descriptions without [Preset: ...] prefix
+- [02-02]: Preset comparison uses self-labeled per-setting rows (Van/Rec/HC) instead of columnar table
 
 ### Pending Todos
 
@@ -62,11 +65,12 @@ None.
 
 ### Blockers/Concerns
 
-- [RESOLVED]: LazyLib JSONUtils persistence API for custom value backup needs verification before Phase 2 coding — verified and implemented in 02-01
-- [RESOLVED]: Removing LunaSettings.json does not affect existing saved settings — confirmed via build test and no source references
+- [RESOLVED]: LazyLib JSONUtils persistence API — verified and implemented in 02-01
+- [RESOLVED]: Removing LunaSettings.json — confirmed no impact
+- [RESOLVED]: LunaSettingsData constructor parameter order — verified (10 params, modID through tab)
 
 ## Session Continuity
 
-Last session: 2026-02-22
-Stopped at: Phase 2 Plan 1 complete, ready for 02-02-PLAN.md
-Resume file: .planning/phases/02-preset-switching-and-custom-persistence/02-02-PLAN.md
+Last session: 2026-02-24
+Stopped at: Phase 2 complete (all 2 plans executed and verified), ready for Phase 3
+Resume file: None

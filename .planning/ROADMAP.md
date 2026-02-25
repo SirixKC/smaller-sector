@@ -13,7 +13,7 @@ This roadmap delivers a tabbed LunaLib settings UI for the Smaller Sector mod in
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Tab Structure and Preset Display** - Restructure settings into tabs with preset radio selector and value summaries
-- [ ] **Phase 2: Preset Switching and Custom Persistence** - Custom value backup/restore across preset switches
+- [x] **Phase 2: Preset Switching and Custom Persistence** - Custom value backup/restore across preset switches
 - [ ] **Phase 3: Faction Management and Bugfixes** - Faction tab content, dialog improvements, blacklist-preset decoupling
 
 ## Phase Details
@@ -45,8 +45,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Custom value backup/restore via JSONUtils with Restore radio option; Vanilla default preset
-- [ ] 02-02-PLAN.md — Dynamic [Preset: value] description hints via LunaSettingsData replacement; human verification
+- [x] 02-01-PLAN.md — Custom value backup/restore via JSONUtils with Restore radio option; Vanilla default preset
+- [x] 02-02-PLAN.md — Dynamic [Preset: value] description hints via LunaSettingsData replacement; human verification
 
 ### Phase 3: Faction Management and Bugfixes
 **Goal**: Users can discover and manage per-faction ship replacement from both the Luna settings Factions tab and the improved in-game dialog
@@ -70,5 +70,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Tab Structure and Preset Display | 2/2 | Complete | 2026-02-21 |
-| 2. Preset Switching and Custom Persistence | 0/2 | Not started | - |
+| 2. Preset Switching and Custom Persistence | 2/2 | Complete | 2026-02-24 |
 | 3. Faction Management and Bugfixes | 0/TBD | Not started | - |
