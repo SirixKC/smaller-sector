@@ -9,7 +9,7 @@ import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.combat.EngagementResultAPI;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
-import com.fs.starfarer.api.loading.WithSourceMod;
+import com.fs.starfarer.api.combat.ShipHullSpecAPI.ShipTypeHints;
 import com.fs.starfarer.api.util.Misc;
 import lunalib.backend.ui.settings.LunaSettingsLoader;
 import lunalib.lunaSettings.LunaSettings;
@@ -112,14 +112,19 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
             String modSource = getFactionModSource(faction);
             dialog.getTextPanel().addPara("  Mod: %s", modColor, h, modSource);
 
-            // Ship counts line
+            // Ship counts line — cruisers and capitals highlighted as affected by replacement
             Map<HullSize, Integer> counts = countShipsBySize(faction);
-            String countsLine = String.format("  F: %d | D: %d | Cr: %d | Cap: %d",
-                    counts.get(HullSize.FRIGATE),
-                    counts.get(HullSize.DESTROYER),
-                    counts.get(HullSize.CRUISER),
-                    counts.get(HullSize.CAPITAL_SHIP));
-            dialog.getTextPanel().addPara(countsLine, g);
+            int frigates = counts.get(HullSize.FRIGATE);
+            int destroyers = counts.get(HullSize.DESTROYER);
+            int cruisers = counts.get(HullSize.CRUISER);
+            int capitals = counts.get(HullSize.CAPITAL_SHIP);
+            int total = frigates + destroyers + cruisers + capitals;
+
+            String countsLine = String.format("  Ships: %d total (F:%d D:%d) | Affected: %s Cr, %s Cap",
+                    total, frigates, destroyers,
+                    String.valueOf(cruisers), String.valueOf(capitals));
+            dialog.getTextPanel().addPara(countsLine, g, h,
+                    String.valueOf(cruisers), String.valueOf(capitals));
 
             String optionText = faction.getDisplayName() + " - " + status;
             dialog.getOptionPanel().addOption(optionText, OPT_TOGGLE_PREFIX + faction.getId());
@@ -153,6 +158,7 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
         for (String hullId : faction.getKnownShips()) {
             ShipHullSpecAPI hull = Global.getSettings().getHullSpec(hullId);
             if (hull != null && !hull.isDefaultDHull()) {
+                if (hull.getHints() != null && hull.getHints().contains(ShipTypeHints.STATION)) continue;
                 HullSize size = hull.getHullSize();
                 if (counts.containsKey(size)) {
                     counts.put(size, counts.get(size) + 1);
@@ -166,11 +172,13 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
         Map<String, Integer> modCounts = new HashMap<>();
         for (String hullId : faction.getKnownShips()) {
             ShipHullSpecAPI hull = Global.getSettings().getHullSpec(hullId);
-            if (hull instanceof WithSourceMod) {
-                ModSpecAPI mod = ((WithSourceMod) hull).getSourceMod();
+            if (hull != null) {
+                ModSpecAPI mod = hull.getSourceMod();
                 if (mod != null) {
                     String name = mod.getName();
                     modCounts.put(name, modCounts.getOrDefault(name, 0) + 1);
+                } else {
+                    modCounts.put("Vanilla", modCounts.getOrDefault("Vanilla", 0) + 1);
                 }
             }
         }
