@@ -3,13 +3,14 @@ package smallersector;
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.CampaignEventListener;
+import com.fs.starfarer.api.campaign.FleetStubAPI;
 import com.fs.starfarer.api.campaign.LocationAPI;
-import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.listeners.ListenerManagerAPI;
-import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import lunalib.lunaSettings.LunaSettings;
 import org.apache.log4j.Logger;
+import java.util.ArrayList;
 
 /**
  * Main mod plugin for Smaller Sector.
@@ -19,6 +20,8 @@ import org.apache.log4j.Logger;
 public class SmallerSectorModPlugin extends BaseModPlugin {
 
     public static final Logger log = Global.getLogger(SmallerSectorModPlugin.class);
+    private static final String FLEET_MIGRATION_KEY =
+            "smallersector_fleet_processing_initialized_v1";
 
     private FleetSpawnListener fleetSpawnListener;
     private MarketInterceptor marketInterceptor;
@@ -43,10 +46,6 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
             log.info("Smaller Sector: Registered preset listener.");
         }
 
-        // Store original base values and apply build cost multipliers
-        BaseValueModifier.storeOriginalValues();
-        BaseValueModifier.applyMultipliers();
-
         log.info("Smaller Sector: Mod loaded successfully.");
     }
 
@@ -69,9 +68,12 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
             return;
         }
 
+        removeOldTransientRegistrations(listeners);
+
         // Fleet spawn listener
         fleetSpawnListener = new FleetSpawnListener(false);
         Global.getSector().addTransientListener(fleetSpawnListener);
+        Global.getSector().addTransientScript(fleetSpawnListener);
 
         // Market/economy listener
         marketInterceptor = new MarketInterceptor();
@@ -80,9 +82,11 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
         // Derelict ship interceptor - replaces cruisers/capitals in derelicts
         derelictInterceptor = new DerelictInterceptor();
         listeners.addListener(derelictInterceptor, true);
+        Global.getSector().addTransientScript(derelictInterceptor);
 
         // Player fleet monitor for D-mods and cost hull mod
         playerFleetMonitor = new PlayerFleetMonitor();
+        listeners.addListener(playerFleetMonitor, true);
         Global.getSector().addTransientScript(playerFleetMonitor);
 
         // Add Faction Manager intel item (if not already present)
@@ -91,22 +95,37 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
             log.info("Smaller Sector: Added Faction Manager intel item.");
         }
 
-        // Initial processing of player fleet
+        // Existing player ships are an explicit migration baseline. Only ships
+        // acquired after this point are eligible for acquisition-time D-mods.
         applyCostHullMod();
-        DmodApplicator.processPlayerFleet();
+        DmodApplicator.grandfatherPlayerFleet();
 
-        // Process all existing fleets (for existing saves)
-        processAllExistingFleets();
+        // Existing saves must not reroll fleets that the old release may already
+        // have altered. A new campaign can safely process procgen fleets now,
+        // before control is handed to the player.
+        initializeExistingFleets(newGame);
+
+        int derelictCount = derelictInterceptor.initializeExistingEntities(newGame);
+        log.info("Smaller Sector: Initialized " + derelictCount + " derelicts.");
 
         // Initial processing of all markets (don't wait for economy tick)
-        processAllMarkets();
+        processAllMarkets(newGame);
 
         log.info("Smaller Sector: Game initialization complete.");
     }
 
     @Override
     public void beforeGameSave() {
-        // Nothing to save - mod is stateless
+        if (fleetSpawnListener != null) {
+            fleetSpawnListener.processPendingFleets();
+        }
+
+        MarketInterceptor.detectNewStoredAcquisitions();
+
+        // Close the small polling window for a ship acquired immediately before
+        // saving, so its persistent marker and any D-mods enter the save together.
+        applyCostHullMod();
+        DmodApplicator.processPlayerFleet();
     }
 
     @Override
@@ -127,25 +146,23 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
         if (playerFleet.getFleetData() == null) return;
 
         for (FleetMemberAPI member : playerFleet.getFleetData().getMembersListCopy()) {
-            applyHullModIfNeeded(member);
+            CostModifier.applyHullModIfNeeded(member);
         }
     }
 
-    /**
-     * Apply the cost modifier hull mod to a fleet member if it's a cruiser or capital.
-     */
-    private void applyHullModIfNeeded(FleetMemberAPI member) {
-        if (member == null) return;
-        if (member.getHullSpec() == null) return;
-        if (member.getVariant() == null) return;
-        if (member.isStation()) return;
+    private void removeOldTransientRegistrations(ListenerManagerAPI listeners) {
+        listeners.removeListenerOfClass(MarketInterceptor.class);
+        listeners.removeListenerOfClass(DerelictInterceptor.class);
+        listeners.removeListenerOfClass(PlayerFleetMonitor.class);
+        Global.getSector().removeTransientScriptsOfClass(PlayerFleetMonitor.class);
+        Global.getSector().removeTransientScriptsOfClass(FleetSpawnListener.class);
+        Global.getSector().removeTransientScriptsOfClass(DerelictInterceptor.class);
 
-        HullSize size = member.getHullSpec().getHullSize();
-        if (size != HullSize.CRUISER && size != HullSize.CAPITAL_SHIP) return;
-
-        String hullModId = CostModifier.HULLMOD_ID;
-        if (!member.getVariant().hasHullMod(hullModId)) {
-            member.getVariant().addPermaMod(hullModId, false);
+        for (CampaignEventListener listener :
+                new ArrayList<CampaignEventListener>(Global.getSector().getAllListeners())) {
+            if (listener instanceof FleetSpawnListener) {
+                Global.getSector().removeListener(listener);
+            }
         }
     }
 
@@ -153,39 +170,62 @@ public class SmallerSectorModPlugin extends BaseModPlugin {
      * Process all markets immediately on game load.
      * This ensures ships are replaced right away, not just on economy ticks.
      */
-    private void processAllMarkets() {
+    private void processAllMarkets(boolean newGame) {
         if (Global.getSector() == null) return;
         if (Global.getSector().getEconomy() == null) return;
 
-        log.info("Smaller Sector: Processing all markets on game load...");
-        int count = 0;
-        for (MarketAPI market : Global.getSector().getEconomy().getMarketsCopy()) {
-            MarketInterceptor.processMarket(market);
-            count++;
-        }
-        log.info("Smaller Sector: Processed " + count + " markets.");
+        int count = MarketInterceptor.initializeMarkets(newGame);
+        log.info("Smaller Sector: Initialized " + count + " markets.");
     }
 
     /**
-     * Process all existing fleets in the sector.
-     * This allows the mod to work on existing saves without requiring a new game.
-     * Fleets are tagged after processing to prevent re-rolling on subsequent loads.
+     * Establish the fleet migration baseline for a loaded campaign.
+     *
+     * On an existing save, all fleets already present are marked without rolling;
+     * the prior mod version did not persist whether it had processed them. On a
+     * new game, procgen fleets are processed once before the campaign is shown.
      */
-    private void processAllExistingFleets() {
+    private void initializeExistingFleets(boolean newGame) {
         if (Global.getSector() == null) return;
 
-        log.info("Smaller Sector: Processing all existing fleets...");
+        boolean migrationComplete = Boolean.TRUE.equals(
+                Global.getSector().getPersistentData().get(FLEET_MIGRATION_KEY));
+        boolean grandfather = !newGame && !migrationComplete;
+
+        if (grandfather) {
+            log.info("Smaller Sector: Grandfathering existing fleets...");
+        } else if (newGame) {
+            log.info("Smaller Sector: Processing new-game fleets...");
+        } else {
+            log.info("Smaller Sector: Processing previously missed fleets...");
+        }
         int count = 0;
 
-        // Process fleets in all locations (star systems, hyperspace, etc.)
         for (LocationAPI location : Global.getSector().getAllLocations()) {
             for (CampaignFleetAPI fleet : location.getFleets()) {
                 if (fleet == null || fleet.isPlayerFleet()) continue;
-                FleetInterceptor.processFleet(fleet);
-                count++;
+                if (FleetInterceptor.hasBeenProcessed(fleet)) continue;
+
+                if (grandfather) {
+                    FleetInterceptor.grandfatherFleet(fleet);
+                } else {
+                    FleetInterceptor.processFleet(fleet);
+                }
+                count += 1;
+            }
+
+            // Deflated route fleets are not returned by getFleets(). On migration
+            // loads, tag their persistent memory too so materializing one later
+            // cannot reroll a fleet that belonged to the old save.
+            if (grandfather) {
+                for (FleetStubAPI stub : location.getFleetStubs()) {
+                    FleetInterceptor.grandfatherFleetStub(stub);
+                }
             }
         }
 
-        log.info("Smaller Sector: Processed " + count + " existing fleets.");
+        Global.getSector().getPersistentData().put(FLEET_MIGRATION_KEY, Boolean.TRUE);
+
+        log.info("Smaller Sector: Initialized " + count + " previously unmarked fleets.");
     }
 }

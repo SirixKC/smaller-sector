@@ -27,7 +27,7 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
     private static final String MOD_ID = "smallersector";
 
     private InteractionDialogAPI dialog;
-    private Set<String> currentBlacklist;
+    private Set<String> currentUserBlacklist;
     private List<FactionAPI> allFactions;
     private int currentPage = 0;
     private static final int FACTIONS_PER_PAGE = 5;
@@ -43,8 +43,9 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
     public void init(InteractionDialogAPI dialog) {
         this.dialog = dialog;
 
-        // Load current blacklist
-        currentBlacklist = new HashSet<>(Settings.getFactionBlacklist());
+        // Preset defaults are an effective union, not user-owned settings. Keep
+        // only editable user entries here so saving cannot make defaults permanent.
+        currentUserBlacklist = new HashSet<>(Settings.getUserFactionBlacklist());
 
         // Get all factions, sorted by name
         allFactions = new ArrayList<>();
@@ -75,7 +76,7 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
         // Header
         dialog.getTextPanel().addPara("Faction Blacklist Manager", h);
         dialog.getTextPanel().addPara("Blacklisted factions will NOT have their ships replaced. " +
-                "Click a faction to toggle its blacklist status.", g);
+                "Click a faction to toggle a custom blacklist entry.", g);
         dialog.getTextPanel().addPara("", g);
 
         // Calculate pagination
@@ -90,6 +91,7 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
 
         // Legend
         dialog.getTextPanel().addPara("[BLACKLISTED] = Protected from replacement", positive);
+        dialog.getTextPanel().addPara("[PRESET DEFAULT] = Protected by the active preset", positive);
         dialog.getTextPanel().addPara("[ACTIVE] = Ships will be replaced", negative);
         dialog.getTextPanel().addPara("", g);
 
@@ -99,9 +101,12 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
 
         for (int i = startIndex; i < endIndex; i++) {
             FactionAPI faction = allFactions.get(i);
-            boolean isBlacklisted = currentBlacklist.contains(faction.getId().toLowerCase());
+            String factionId = faction.getId().toLowerCase();
+            boolean presetDefault = Settings.isPresetDefaultBlacklisted(factionId);
+            boolean isBlacklisted = presetDefault || currentUserBlacklist.contains(factionId);
 
-            String status = isBlacklisted ? "[BLACKLISTED]" : "[ACTIVE]";
+            String status = presetDefault ? "[PRESET DEFAULT]"
+                    : isBlacklisted ? "[BLACKLISTED]" : "[ACTIVE]";
             Color statusColor = isBlacklisted ? positive : negative;
 
             // Faction name line with highlight
@@ -127,7 +132,11 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
                     String.valueOf(cruisers), String.valueOf(capitals));
 
             String optionText = faction.getDisplayName() + " - " + status;
-            dialog.getOptionPanel().addOption(optionText, OPT_TOGGLE_PREFIX + faction.getId());
+            String optionId = OPT_TOGGLE_PREFIX + faction.getId();
+            dialog.getOptionPanel().addOption(optionText, optionId);
+            if (presetDefault) {
+                dialog.getOptionPanel().setEnabled(optionId, false);
+            }
         }
 
         dialog.getOptionPanel().addOption("", "spacer1");
@@ -145,8 +154,9 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
         dialog.getOptionPanel().setEnabled("spacer2", false);
 
         // Save/Cancel
-        int blacklistCount = currentBlacklist.size();
-        dialog.getOptionPanel().addOption("Save Changes (" + blacklistCount + " blacklisted)", OPT_SAVE);
+        int blacklistCount = currentUserBlacklist.size();
+        dialog.getOptionPanel().addOption(
+                "Save Changes (" + blacklistCount + " custom entries)", OPT_SAVE);
         dialog.getOptionPanel().addOption("Cancel", OPT_CANCEL);
     }
 
@@ -197,10 +207,11 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
         if (option.startsWith(OPT_TOGGLE_PREFIX)) {
             // Toggle faction blacklist status
             String factionId = option.substring(OPT_TOGGLE_PREFIX.length()).toLowerCase();
-            if (currentBlacklist.contains(factionId)) {
-                currentBlacklist.remove(factionId);
+            if (Settings.isPresetDefaultBlacklisted(factionId)) return;
+            if (currentUserBlacklist.contains(factionId)) {
+                currentUserBlacklist.remove(factionId);
             } else {
-                currentBlacklist.add(factionId);
+                currentUserBlacklist.add(factionId);
             }
             showFactionList();
 
@@ -225,7 +236,9 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
         try {
             // Build comma-separated string
             StringBuilder sb = new StringBuilder();
-            for (String factionId : currentBlacklist) {
+            List<String> sortedFactionIds = new ArrayList<String>(currentUserBlacklist);
+            Collections.sort(sortedFactionIds);
+            for (String factionId : sortedFactionIds) {
                 if (sb.length() > 0) sb.append(",");
                 sb.append(factionId);
             }
@@ -250,7 +263,8 @@ public class FactionManagerDialog implements InteractionDialogPlugin {
             Settings.reloadBlacklist();
 
             Global.getSector().getCampaignUI().addMessage(
-                    "Faction blacklist saved. " + currentBlacklist.size() + " factions protected.",
+                    "Faction blacklist saved. " + currentUserBlacklist.size() +
+                            " custom entries stored.",
                     Misc.getPositiveHighlightColor());
 
         } catch (Exception e) {

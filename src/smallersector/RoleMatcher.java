@@ -30,6 +30,8 @@ public class RoleMatcher {
 
         Set<String> tags = hull.getTags();
         EnumSet<ShipTypeHints> hints = hull.getHints();
+        if (tags == null) tags = Collections.emptySet();
+        if (hints == null) hints = EnumSet.noneOf(ShipTypeHints.class);
 
         // Check for carrier
         if (hull.getFighterBays() > 0) {
@@ -219,10 +221,13 @@ public class RoleMatcher {
         }
 
         Set<String> knownShips = faction.getKnownShips();
+        if (knownShips == null) return result;
 
         for (String hullId : knownShips) {
+            if (hullId == null) continue;
             ShipHullSpecAPI hull = Global.getSettings().getHullSpec(hullId);
             if (hull == null || hull.getHullSize() != size || hull.isDefaultDHull()) continue;
+            if (ShipReplacer.isProtectedHull(hull)) continue;
             if (hull.getHints() != null && hull.getHints().contains(ShipTypeHints.STATION)) continue;
             result.add(hull);
         }

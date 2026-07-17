@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Modifies ship base values (production/purchase cost) for cruisers and capitals.
- * Uses MagicLib's ReflectionUtils to bypass security restrictions.
+ * Disabled experiment for mutating hull-spec base values through reflection.
+ *
+ * This class is deliberately not called by the runtime plugin. Production cost
+ * and time need a supported implementation before these settings can take effect.
  */
 public class BaseValueModifier {
 

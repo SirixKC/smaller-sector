@@ -3,17 +3,19 @@ package smallersector;
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
-import com.fs.starfarer.api.combat.ShipAPI.HullSize;
+import com.fs.starfarer.api.campaign.InteractionDialogAPI;
+import com.fs.starfarer.api.campaign.listeners.ShipRecoveryListener;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Monitors the player fleet for new cruisers and capitals.
  * Applies the cost hull mod and D-mods to newly added ships.
  */
-public class PlayerFleetMonitor implements EveryFrameScript {
+public class PlayerFleetMonitor implements EveryFrameScript, ShipRecoveryListener {
 
     // Track ships we've already processed by their unique ID
     private Set<String> processedShips = new HashSet<String>();
@@ -44,6 +46,22 @@ public class PlayerFleetMonitor implements EveryFrameScript {
         checkPlayerFleet();
     }
 
+    @Override
+    public void reportShipsRecovered(List<FleetMemberAPI> ships, InteractionDialogAPI dialog) {
+        if (ships == null) return;
+
+        // Recovery occurs while an interaction dialog is paused. Process the
+        // returned members synchronously so there is no acquisition/save window.
+        for (FleetMemberAPI member : ships) {
+            if (member != null && processNewShip(member)) {
+                String memberId = member.getId();
+                if (memberId != null) {
+                    processedShips.add(memberId);
+                }
+            }
+        }
+    }
+
     private void checkPlayerFleet() {
         if (Global.getSector() == null) return;
 
@@ -57,39 +75,33 @@ public class PlayerFleetMonitor implements EveryFrameScript {
             String shipId = member.getId();
 
             // Skip if we've already processed this ship
-            if (processedShips.contains(shipId)) {
+            if (shipId != null && processedShips.contains(shipId)) {
                 continue;
             }
 
-            // Process new ship
-            processNewShip(member);
-            processedShips.add(shipId);
+            // Only cache fully initialized members. A newly-created member can be
+            // visible to the campaign API one frame before its variant is ready.
+            if (processNewShip(member)) {
+                if (shipId != null) {
+                    processedShips.add(shipId);
+                }
+            }
         }
 
         // Clean up removed ships from tracking set (prevent memory leak)
         cleanupRemovedShips(playerFleet);
     }
 
-    private void processNewShip(FleetMemberAPI member) {
-        if (member.getHullSpec() == null) return;
-        if (member.getVariant() == null) return;
-        if (member.isStation()) return;
+    private boolean processNewShip(FleetMemberAPI member) {
+        if (member.getHullSpec() == null) return false;
+        if (member.getVariant() == null) return false;
 
-        HullSize size = member.getHullSpec().getHullSize();
+        CostModifier.applyHullModIfNeeded(member);
 
-        // Only process cruisers and capitals
-        if (size != HullSize.CRUISER && size != HullSize.CAPITAL_SHIP) {
-            return;
-        }
-
-        // Apply cost hull mod if not present
-        String hullModId = CostModifier.HULLMOD_ID;
-        if (!member.getVariant().hasHullMod(hullModId)) {
-            member.getVariant().addPermaMod(hullModId, false);
-        }
-
-        // Apply D-mods
+        // Check every hull size. DmodApplicator persistently records zero-D-mod,
+        // station, story, and unique exclusions as well as successful rolls.
         DmodApplicator.applyDmodsIfNeeded(member);
+        return true;
     }
 
     private void cleanupRemovedShips(CampaignFleetAPI playerFleet) {
@@ -97,7 +109,10 @@ public class PlayerFleetMonitor implements EveryFrameScript {
         Set<String> currentIds = new HashSet<String>();
         for (FleetMemberAPI member : playerFleet.getFleetData().getMembersListCopy()) {
             if (member != null) {
-                currentIds.add(member.getId());
+                String memberId = member.getId();
+                if (memberId != null) {
+                    currentIds.add(memberId);
+                }
             }
         }
 

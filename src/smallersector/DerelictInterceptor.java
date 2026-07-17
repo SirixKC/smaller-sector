@@ -1,6 +1,9 @@
 package smallersector;
 
+import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CustomCampaignEntityAPI;
+import com.fs.starfarer.api.campaign.LocationAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.listeners.DiscoverEntityListener;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
@@ -8,22 +11,87 @@ import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.impl.campaign.DerelictShipEntityPlugin;
 import com.fs.starfarer.api.impl.campaign.DerelictShipEntityPlugin.DerelictShipData;
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags;
+import com.fs.starfarer.api.impl.campaign.ids.Tags;
 import com.fs.starfarer.api.impl.campaign.rulecmd.salvage.special.ShipRecoverySpecial.PerShipData;
 import org.apache.log4j.Logger;
+import org.magiclib.ReflectionUtils;
 
 import java.util.Random;
 
 /**
- * Intercepts derelict ship discovery and replaces cruisers/capitals with smaller ships.
- *
- * This listener is called when the player discovers a derelict entity.
- * We modify the ship data BEFORE the player sees what type of ship it is.
+ * Replaces eligible procedural derelicts before the player sees their ship type.
+ * Discovery events are supplemented by a bounded current-location scan because
+ * vanilla wreck entities are not discoverable by default.
  */
-public class DerelictInterceptor implements DiscoverEntityListener {
+public class DerelictInterceptor implements DiscoverEntityListener, EveryFrameScript {
 
     private static final Logger log = Global.getLogger(DerelictInterceptor.class);
-    private static final Random random = new Random();
+    private static final Random RANDOM = new Random();
     private static final String PROCESSED_TAG = "smallersector_derelict_processed";
+    private static final String MIGRATION_KEY =
+            "smallersector_derelict_processing_initialized_v1";
+    // Vanilla story wrecks that predate consistent mission-important tagging.
+    private static final String GATE_SCAN_DERELICT_KEY = "$gateScanDerelict";
+    private static final String ANCIENT_ONSLAUGHT_KEY = "$onslaughtMkI";
+
+    /**
+     * Establish the derelict baseline before campaign control is returned.
+     * Existing-save entities are grandfathered once; new-game and subsequently
+     * missed entities are processed immediately, before they can be rendered.
+     */
+    public int initializeExistingEntities(boolean newGame) {
+        if (Global.getSector() == null) return 0;
+
+        boolean migrationComplete = Boolean.TRUE.equals(
+                Global.getSector().getPersistentData().get(MIGRATION_KEY));
+        boolean grandfather = !newGame && !migrationComplete;
+        int count = 0;
+
+        for (LocationAPI location : Global.getSector().getAllLocations()) {
+            for (CustomCampaignEntityAPI entity : location.getCustomEntities()) {
+                if (entity == null || entity.hasTag(PROCESSED_TAG)) continue;
+                if (!(entity.getCustomPlugin() instanceof DerelictShipEntityPlugin)) continue;
+
+                if (grandfather) {
+                    entity.addTag(PROCESSED_TAG);
+                } else {
+                    reportEntityDiscovered(entity);
+                }
+                count += 1;
+            }
+        }
+
+        Global.getSector().getPersistentData().put(MIGRATION_KEY, Boolean.TRUE);
+        return count;
+    }
+
+    @Override
+    public void advance(float amount) {
+        if (Global.getSector() == null || Global.getSector().getCurrentLocation() == null) return;
+
+        // DerelictShipEntityPlugin sets discoverable=false by default, so the
+        // discovery event alone cannot cover dynamically created wrecks. A scan
+        // of only the current location runs before campaign rendering and catches
+        // new entities after their creating call has attached story protection.
+        for (CustomCampaignEntityAPI entity :
+                Global.getSector().getCurrentLocation().getCustomEntities()) {
+            if (entity == null || entity.hasTag(PROCESSED_TAG)) continue;
+            if (entity.getCustomPlugin() instanceof DerelictShipEntityPlugin) {
+                reportEntityDiscovered(entity);
+            }
+        }
+    }
+
+    @Override
+    public boolean isDone() {
+        return false;
+    }
+
+    @Override
+    public boolean runWhilePaused() {
+        return true;
+    }
 
     @Override
     public void reportEntityDiscovered(SectorEntityToken entity) {
@@ -34,15 +102,19 @@ public class DerelictInterceptor implements DiscoverEntityListener {
             return;
         }
 
+        // Discovery is a one-shot decision. Mark before any data lookup so an
+        // unchanged, protected, or malformed derelict is stable across reloads.
+        if (entity.hasTag(PROCESSED_TAG)) return;
+        entity.addTag(PROCESSED_TAG);
+
+        if (isProtectedEntity(entity)) {
+            return;
+        }
+
         DerelictShipEntityPlugin plugin = (DerelictShipEntityPlugin) entity.getCustomPlugin();
         DerelictShipData data = plugin.getData();
 
         if (data == null || data.ship == null) {
-            return;
-        }
-
-        // Skip if already processed (prevents re-rolling on game load)
-        if (entity.hasTag(PROCESSED_TAG)) {
             return;
         }
 
@@ -52,11 +124,30 @@ public class DerelictInterceptor implements DiscoverEntityListener {
     private void processDerelictShip(SectorEntityToken entity, DerelictShipData data) {
         PerShipData shipData = data.ship;
 
+        // Captained, identity-bearing, always-known, and direct custom variants
+        // are strong indicators of scripted content even when a mod omitted the
+        // canonical mission tags. Ordinary procgen wrecks also receive random
+        // ship names, so shipName alone is intentionally not an exclusion.
+        if (isProtectedShipData(shipData)) {
+            return;
+        }
+
         // Get the variant to determine hull size
         // PerShipData.getVariant() handles loading from variantId if needed
-        ShipVariantAPI variant = shipData.getVariant();
+        ShipVariantAPI variant;
+        try {
+            variant = shipData.getVariant();
+        } catch (Throwable t) {
+            log.warn("Smaller Sector: Could not load derelict variant " +
+                    shipData.variantId + "; leaving the wreck unchanged.", t);
+            return;
+        }
         if (variant == null) {
-            log.debug("DerelictInterceptor: Could not get variant for " + shipData.variantId);
+            log.debug("Smaller Sector: Could not get derelict variant for " + shipData.variantId);
+            return;
+        }
+
+        if (ShipReplacer.isProtectedVariant(variant)) {
             return;
         }
 
@@ -69,10 +160,13 @@ public class DerelictInterceptor implements DiscoverEntityListener {
             return; // Only process cruisers and capitals
         }
 
-        // Determine faction for role matching (use entity faction or default to independent)
+        // Procgen wrecks use the neutral entity faction, which has no ship pool.
+        // Independent is the vanilla mixed-faction fallback for such derelicts.
         String factionId = "independent";
-        if (entity.getFaction() != null) {
+        if (entity.getFaction() != null && !entity.getFaction().isNeutralFaction()) {
             factionId = entity.getFaction().getId();
+        } else {
+            factionId = ShipReplacer.findOwningFactionId(variant);
         }
 
         // Check blacklist
@@ -84,18 +178,54 @@ public class DerelictInterceptor implements DiscoverEntityListener {
         String replacementVariantId = tryGetReplacement(variant, factionId, size);
 
         if (replacementVariantId != null) {
-            log.info("Smaller Sector: Replacing derelict " + shipData.variantId +
-                     " with " + replacementVariantId);
+            String originalVariantId = shipData.variantId;
+            ShipVariantAPI originalVariant = shipData.variant;
+
             shipData.variantId = replacementVariantId;
             shipData.variant = null; // Clear cached variant so it reloads
+
+            // DerelictShipEntityPlugin caches its member and campaign sprite.
+            // Refresh that cache now or the old hull remains visible until reload.
+            if (refreshDerelictPlugin(entity, (DerelictShipEntityPlugin) entity.getCustomPlugin())) {
+                log.debug("Smaller Sector: Replaced derelict " + originalVariantId +
+                          " with " + replacementVariantId);
+            } else {
+                shipData.variantId = originalVariantId;
+                shipData.variant = originalVariant;
+                // If cache rebuilding failed partway through, make a best-effort
+                // pass to restore the original visual and cached member too.
+                refreshDerelictPlugin(entity, (DerelictShipEntityPlugin) entity.getCustomPlugin());
+            }
         }
 
-        // Mark as processed
-        entity.addTag(PROCESSED_TAG);
+    }
+
+    private boolean isProtectedEntity(SectorEntityToken entity) {
+        if (entity.hasTag(Tags.STORY_CRITICAL)
+                || entity.hasTag(Tags.MISSION_ITEM)
+                || entity.hasTag(Tags.MISSION_LOCATION)
+                || entity.hasTag(Tags.NOT_RANDOM_MISSION_TARGET)
+                || entity.hasTag(Tags.SHIP_UNIQUE_SIGNATURE)) {
+            return true;
+        }
+        if (entity.getMemoryWithoutUpdate() == null) return false;
+        return entity.getMemoryWithoutUpdate().contains(MemFlags.STORY_CRITICAL)
+                || entity.getMemoryWithoutUpdate().contains(MemFlags.ENTITY_MISSION_IMPORTANT)
+                || entity.getMemoryWithoutUpdate().contains(MemFlags.MEMORY_KEY_MISSION_IMPORTANT)
+                || entity.getMemoryWithoutUpdate().contains(GATE_SCAN_DERELICT_KEY)
+                || entity.getMemoryWithoutUpdate().contains(ANCIENT_ONSLAUGHT_KEY);
+    }
+
+    private boolean isProtectedShipData(PerShipData shipData) {
+        if (shipData == null) return true;
+        if (shipData.captain != null) return true;
+        if (shipData.fleetMemberId != null && !shipData.fleetMemberId.trim().isEmpty()) return true;
+        if (Boolean.TRUE.equals(shipData.nameAlwaysKnown)) return true;
+        return shipData.variant != null && shipData.variantId == null;
     }
 
     private String tryGetReplacement(ShipVariantAPI original, String factionId, HullSize size) {
-        int roll = random.nextInt(100);
+        int roll = RANDOM.nextInt(100);
         HullSize targetSize = null;
 
         if (size == HullSize.CRUISER) {
@@ -133,31 +263,30 @@ public class DerelictInterceptor implements DiscoverEntityListener {
             return null;
         }
 
-        // Try to find a valid variant for the replacement hull
-        String hullId = replacement.getHullId();
+        return ShipReplacer.findOutfittedVariantId(replacement, factionId);
+    }
 
-        // Try standard patterns in order of preference
-        String[] patterns = {
-            hullId + "_Hull",           // Standard hull-only variant
-            hullId + "_standard",       // Some mods use this
-            hullId + "_Standard",       // Case variation
-            hullId                      // Just the hull ID (sometimes works)
-        };
+    private boolean refreshDerelictPlugin(
+            SectorEntityToken entity, DerelictShipEntityPlugin plugin) {
+        try {
+            ReflectionUtils.INSTANCE.invoke(
+                    "readResolve", plugin, new Object[0], true);
 
-        for (String variantId : patterns) {
-            ShipVariantAPI testVariant = Global.getSettings().getVariant(variantId);
-            if (testVariant != null) {
-                return variantId;
+            ShipVariantAPI refreshed = plugin.getData().ship.getVariant();
+            if (refreshed == null || refreshed.getHullSpec() == null) return false;
+
+            HullSize size = refreshed.getHullSpec().getHullSize();
+            entity.getDetectedRangeMod().modifyFlat(
+                    "gen", DerelictShipEntityPlugin.getDetectedAtRange(size));
+            if (entity instanceof CustomCampaignEntityAPI) {
+                ((CustomCampaignEntityAPI) entity).setRadius(
+                        DerelictShipEntityPlugin.getRadius(size));
             }
+            return true;
+        } catch (Throwable t) {
+            log.error("Smaller Sector: Could not refresh replaced derelict visual; " +
+                    "keeping the original ship.", t);
+            return false;
         }
-
-        // If no variant found, try to get any variant for this hull
-        java.util.List<String> allVariants = Global.getSettings().getHullIdToVariantListMap().get(hullId);
-        if (allVariants != null && !allVariants.isEmpty()) {
-            return allVariants.get(0);
-        }
-
-        log.warn("DerelictInterceptor: Could not find valid variant for hull " + hullId);
-        return null;
     }
 }

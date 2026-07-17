@@ -44,8 +44,7 @@
         <javac srcdir="${src.dir}"
                destdir="${build.dir}"
                classpathref="compile.classpath"
-               source="17"
-               target="17"
+               release="17"
                includeantruntime="false"
                debug="true">
         </javac>

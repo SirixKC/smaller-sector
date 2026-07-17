@@ -70,8 +70,6 @@ public class PresetListener implements LunaSettingsListener {
     private static final Map<String, Object> RECOMMENDED_VALUES = new HashMap<>();
     private static final Map<String, Object> HARDCORE_VALUES = new HashMap<>();
 
-    private static final String SIRIX_BLACKLIST = "remnant,omega,derelict,hmi_nightmare,mess,jdp_deadcomm,threat,rat_abyssals,rat_abyssals_primordials,rat_abyssals_deep,rat_abyssals_harmony,rat_abyssals_serenity,rat_abyssals_sim,rat_abyssals_solitude,rat_abyssals_wastes,sotf_dreaminggestalt,zea_elysians,zea_dusk,zea_dawn,khewarpedomega,ml_bounty,nex_derelict";
-
     static {
         // Vanilla preset - no modifications
         VANILLA_VALUES.put("cruiserToFrigate", 0);
@@ -89,7 +87,6 @@ public class PresetListener implements LunaSettingsListener {
         VANILLA_VALUES.put("capitalBuildCostMult", 1.0);
         VANILLA_VALUES.put("cruiserDmodCount", 0);
         VANILLA_VALUES.put("capitalDmodCount", 0);
-        VANILLA_VALUES.put("factionBlacklist", "");
 
         // Sirix Recommended preset
         RECOMMENDED_VALUES.put("cruiserToFrigate", 30);
@@ -107,7 +104,6 @@ public class PresetListener implements LunaSettingsListener {
         RECOMMENDED_VALUES.put("capitalBuildCostMult", 2.0);
         RECOMMENDED_VALUES.put("cruiserDmodCount", 2);
         RECOMMENDED_VALUES.put("capitalDmodCount", 3);
-        RECOMMENDED_VALUES.put("factionBlacklist", SIRIX_BLACKLIST);
 
         // Sirix Hardcore preset
         HARDCORE_VALUES.put("cruiserToFrigate", 50);
@@ -125,15 +121,11 @@ public class PresetListener implements LunaSettingsListener {
         HARDCORE_VALUES.put("capitalBuildCostMult", 5.0);
         HARDCORE_VALUES.put("cruiserDmodCount", 3);
         HARDCORE_VALUES.put("capitalDmodCount", 5);
-        HARDCORE_VALUES.put("factionBlacklist", SIRIX_BLACKLIST);
     }
 
     @Override
     public void settingsChanged(String modID) {
         if (!MOD_ID.equals(modID)) return;
-
-        // Always update multipliers when settings change
-        BaseValueModifier.applyMultipliers();
 
         // Show warning that save/reload is needed for operating costs
         if (com.fs.starfarer.api.Global.getSector() != null) {
@@ -157,6 +149,11 @@ public class PresetListener implements LunaSettingsListener {
 
         // Handle load-preset radio (new feature)
         handleLoadPreset(currentPreset);
+
+        // The user blacklist is independent of presets. Refresh the effective
+        // union after every settings save, including edits that do not change
+        // the active preset.
+        Settings.reloadBlacklist();
 
         // Backup custom values when saving with Custom preset active
         if ("Custom".equals(currentPreset)) {
@@ -266,9 +263,6 @@ public class PresetListener implements LunaSettingsListener {
 
             // 4. Update the live UI elements directly
             updateUIElements(presetValues);
-
-            // 5. Reload our blacklist cache
-            Settings.reloadBlacklist();
 
             com.fs.starfarer.api.Global.getLogger(this.getClass()).info(
                 "Applied preset '" + currentPreset + "' - all settings updated");

@@ -9,8 +9,6 @@ import java.util.Set;
 public class Settings {
 
     private static final String MOD_ID = "smallersector";
-    private static final org.apache.log4j.Logger log = com.fs.starfarer.api.Global.getLogger(Settings.class);
-
     // Preset names
     private static final String PRESET_CUSTOM = "Custom";
     private static final String PRESET_VANILLA = "Vanilla";
@@ -22,9 +20,7 @@ public class Settings {
      */
     public static String getPreset() {
         String val = LunaSettings.getString(MOD_ID, "preset");
-        String result = val != null ? val : PRESET_VANILLA;
-        log.info("Settings.getPreset() = '" + result + "' (raw: " + val + ")");
-        return result;
+        return val != null ? val : PRESET_VANILLA;
     }
 
     // Cruiser replacement
@@ -97,9 +93,7 @@ public class Settings {
         if (PRESET_HARDCORE.equals(preset)) return 2.0f;
         // Custom
         Double val = LunaSettings.getDouble(MOD_ID, "cruiserCrewMult");
-        float result = val != null ? val.floatValue() : 1.5f;
-        log.info("Settings.getCruiserCrewMult() = " + result + " (raw LunaSettings: " + val + ")");
-        return result;
+        return val != null ? val.floatValue() : 1.5f;
     }
 
     public static float getCruiserSupplyMult() {
@@ -175,19 +169,14 @@ public class Settings {
 
     public static float getBuildCostMult(HullSize size) {
         if (size == null) return 1.0f;
-        float result;
         switch (size) {
             case CRUISER:
-                result = getCruiserBuildCostMult();
-                break;
+                return getCruiserBuildCostMult();
             case CAPITAL_SHIP:
-                result = getCapitalBuildCostMult();
-                break;
+                return getCapitalBuildCostMult();
             default:
-                result = 1.0f;
+                return 1.0f;
         }
-        log.info("Settings.getBuildCostMult(" + size + ") = " + result);
-        return result;
     }
 
     // D-mod counts for player-built ships
@@ -225,6 +214,7 @@ public class Settings {
 
     // Faction blacklist
     private static Set<String> blacklistCache = null;
+    private static Set<String> userBlacklistCache = null;
 
     // Default blacklist for Sirix presets
     // These are AI/special factions that shouldn't have their ships replaced
@@ -276,9 +266,28 @@ public class Settings {
         return Collections.unmodifiableSet(blacklistCache);
     }
 
+    /** Return only user-managed entries, excluding defaults contributed by a preset. */
+    public static synchronized Set<String> getUserFactionBlacklist() {
+        if (userBlacklistCache == null) {
+            reloadBlacklist();
+        }
+        return Collections.unmodifiableSet(userBlacklistCache);
+    }
+
+    /** Whether the active named preset contributes this faction automatically. */
+    public static boolean isPresetDefaultBlacklisted(String factionId) {
+        if (factionId == null) return false;
+        String preset = getPreset();
+        if (!PRESET_RECOMMENDED.equals(preset) && !PRESET_HARDCORE.equals(preset)) {
+            return false;
+        }
+        return SIRIX_DEFAULT_BLACKLIST.contains(factionId.toLowerCase());
+    }
+
     public static synchronized void reloadBlacklist() {
         String preset = getPreset();
         blacklistCache = new HashSet<String>();
+        userBlacklistCache = new HashSet<String>();
 
         // Sirix presets: start with default blacklist (AI/special factions)
         if (PRESET_RECOMMENDED.equals(preset) || PRESET_HARDCORE.equals(preset)) {
@@ -289,9 +298,13 @@ public class Settings {
         String raw = LunaSettings.getString(MOD_ID, "factionBlacklist");
         if (raw != null && !raw.trim().isEmpty()) {
             for (String faction : raw.split(",")) {
-                blacklistCache.add(faction.trim().toLowerCase());
+                String normalized = faction.trim().toLowerCase();
+                if (!normalized.isEmpty()) {
+                    userBlacklistCache.add(normalized);
+                }
             }
         }
+        blacklistCache.addAll(userBlacklistCache);
     }
 
     public static boolean isFactionBlacklisted(String factionId) {

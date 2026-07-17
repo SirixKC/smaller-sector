@@ -1,6 +1,6 @@
 fieldID,fieldName,fieldType,defaultValue,secondaryValue,fieldDescription,minValue,maxValue,tab
 preset,Difficulty Preset,Radio,Vanilla,"Custom,Vanilla,Sirix Recommended,Sirix Hardcore",Select a preset to override all settings. Choose Custom to use individual settings from the Configuration tab.,,,Presets
-ss_active_preset,Active Preset,String,">> Active: Sirix Recommended <<",,,,,Presets
+ss_active_preset,Active Preset,String,">> Active: Vanilla <<",,,,,Presets
 ss_header_comparison,Preset Comparison,Header,Preset Comparison,,,,,Presets
 ss_section_replacement,--- Ship Replacement ---,Text,--- Ship Replacement ---,,,,,Presets
 ss_repl_c2f,Cruiser to Frigate,Text,"Cruiser→Frigate: Van [0%%] | Rec [30%%] | HC [50%%]",,,,,Presets
@@ -14,11 +14,11 @@ ss_section_costs,--- Costs & Penalties ---,Text,--- Costs & Penalties ---,,,,,Pr
 ss_cost_c_crew,Cruiser Crew,Text,"Cruiser Crew: Van [1.0x] | Rec [1.5x] | HC [2.0x]",,,,,Presets
 ss_cost_c_supply,Cruiser Supply,Text,"Cruiser Supply: Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
 ss_cost_c_fuel,Cruiser Fuel,Text,"Cruiser Fuel: Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
-ss_cost_c_build,Cruiser Build Cost,Text,"Cruiser Build: Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
+ss_cost_c_build,Cruiser Build Cost (Planned),Text,"Cruiser Build (planned): Van [1.0x] | Rec [1.5x] | HC [3.0x]",,,,,Presets
 ss_cost_k_crew,Capital Crew,Text,"Capital Crew: Van [1.0x] | Rec [2.0x] | HC [3.0x]",,,,,Presets
 ss_cost_k_supply,Capital Supply,Text,"Capital Supply: Van [1.0x] | Rec [2.0x] | HC [4.0x]",,,,,Presets
 ss_cost_k_fuel,Capital Fuel,Text,"Capital Fuel: Van [1.0x] | Rec [2.0x] | HC [4.0x]",,,,,Presets
-ss_cost_k_build,Capital Build Cost,Text,"Capital Build: Van [1.0x] | Rec [2.0x] | HC [5.0x]",,,,,Presets
+ss_cost_k_build,Capital Build Cost (Planned),Text,"Capital Build (planned): Van [1.0x] | Rec [2.0x] | HC [5.0x]",,,,,Presets
 ss_section_dmods,--- D-Mods ---,Text,--- D-Mods ---,,,,,Presets
 ss_dmod_cruiser,Cruiser D-Mods,Text,"Cruiser D-Mods: Van [0] | Rec [2] | HC [3]",,,,,Presets
 ss_dmod_capital,Capital D-Mods,Text,"Capital D-Mods: Van [0] | Rec [3] | HC [5]",,,,,Presets
@@ -40,12 +40,12 @@ ss_sub_cruiser_cost,Cruiser,Text,Cruiser,,,,,Configuration
 cruiserCrewMult,Cruiser Crew Multiplier,Double,1.5,,Multiplier for cruiser minimum crew requirements,0.1,10,Configuration
 cruiserSupplyMult,Cruiser Supply Multiplier,Double,1.5,,Multiplier for cruiser supply costs,0.1,10,Configuration
 cruiserFuelMult,Cruiser Fuel Multiplier,Double,1.5,,Multiplier for cruiser fuel consumption,0.1,10,Configuration
-cruiserBuildCostMult,Cruiser Build Cost Multiplier,Double,1.5,,Multiplier for cruiser base value (affects production and purchase cost),1.0,10.0,Configuration
+cruiserBuildCostMult,Cruiser Build Cost Multiplier (Planned),Double,1.5,,Reserved for the planned production-cost feature; not currently applied,1.0,10.0,Configuration
 ss_sub_capital_cost,Capital,Text,Capital,,,,,Configuration
 capitalCrewMult,Capital Crew Multiplier,Double,2.0,,Multiplier for capital minimum crew requirements,0.1,10,Configuration
 capitalSupplyMult,Capital Supply Multiplier,Double,2.0,,Multiplier for capital supply costs,0.1,10,Configuration
 capitalFuelMult,Capital Fuel Multiplier,Double,2.0,,Multiplier for capital fuel consumption,0.1,10,Configuration
-capitalBuildCostMult,Capital Build Cost Multiplier,Double,2.0,,Multiplier for capital base value (affects production and purchase cost),1.0,10.0,Configuration
+capitalBuildCostMult,Capital Build Cost Multiplier (Planned),Double,2.0,,Reserved for the planned production-cost feature; not currently applied,1.0,10.0,Configuration
 cruiserDmodCount,Cruiser D-Mods,Int,2,,Number of D-mods applied to cruisers built or acquired by the player,0,5,Configuration
 capitalDmodCount,Capital D-Mods,Int,3,,Number of D-mods applied to capitals built or acquired by the player,0,5,Configuration
 ss_faction_guide,Faction Manager,Text,"[TIP:] Use the in-game [Faction Manager] to browse all loaded factions and toggle blacklist status. Open your [Intel Screen] (Missions tab) to find it.",,,,,Factions

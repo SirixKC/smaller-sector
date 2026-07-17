@@ -1,30 +1,22 @@
 package smallersector;
 
-import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
-import org.apache.log4j.Logger;
+import com.fs.starfarer.api.combat.ShipVariantAPI;
+import com.fs.starfarer.api.fleet.FleetMemberAPI;
 
 public class CostModifier {
 
-    private static final Logger log = Global.getLogger(CostModifier.class);
     public static final String HULLMOD_ID = "smallersector_cost_modifier";
 
     /**
      * Apply operating cost multipliers to a ship's stats.
      * Called via hull mod that's added to all cruisers/capitals.
      *
-     * Note: Build/production costs are handled separately by BaseValueModifier,
-     * which modifies the hull spec's base value directly.
+     * Production cost and time modifiers are not implemented yet.
      */
     public static void applyToStats(MutableShipStatsAPI stats, HullSize size) {
         if (stats == null || size == null) return;
-
-        // Get ship name for logging
-        String shipName = "unknown";
-        if (stats.getFleetMember() != null) {
-            shipName = stats.getFleetMember().getShipName();
-        }
 
         if (size == HullSize.CRUISER) {
             float crewMult = Settings.getCruiserCrewMult();
@@ -36,9 +28,6 @@ public class CostModifier {
             stats.getSuppliesToRecover().modifyMult(HULLMOD_ID, supplyMult);
             stats.getFuelUseMod().modifyMult(HULLMOD_ID, fuelMult);
 
-            log.info("Smaller Sector: [" + shipName + "] CRUISER - applied multipliers: crew=" + crewMult +
-                     ", supply=" + supplyMult + ", fuel=" + fuelMult);
-
         } else if (size == HullSize.CAPITAL_SHIP) {
             float crewMult = Settings.getCapitalCrewMult();
             float supplyMult = Settings.getCapitalSupplyMult();
@@ -49,8 +38,6 @@ public class CostModifier {
             stats.getSuppliesToRecover().modifyMult(HULLMOD_ID, supplyMult);
             stats.getFuelUseMod().modifyMult(HULLMOD_ID, fuelMult);
 
-            log.info("Smaller Sector: [" + shipName + "] CAPITAL - applied multipliers: crew=" + crewMult +
-                     ", supply=" + supplyMult + ", fuel=" + fuelMult);
         }
     }
 
@@ -58,6 +45,10 @@ public class CostModifier {
      * Apply crew multiplier to min crew only, capping at max crew.
      */
     private static void applyCrewMultiplier(MutableShipStatsAPI stats, float crewMult) {
+        // The capped path uses a flat modifier while the normal path uses a
+        // multiplier. Clear either previous representation when settings change.
+        stats.getMinCrewMod().unmodify(HULLMOD_ID);
+
         // Get base values from hull spec if available
         float baseMinCrew = 0;
         float baseMaxCrew = 0;
@@ -75,7 +66,6 @@ public class CostModifier {
             // Use flat modifier to set min crew to max crew
             float flatBonus = baseMaxCrew - baseMinCrew;
             stats.getMinCrewMod().modifyFlat(HULLMOD_ID, flatBonus);
-            log.info("Smaller Sector: Capped min crew at max crew (" + baseMaxCrew + ")");
         } else {
             // Apply the multiplier normally
             stats.getMinCrewMod().modifyMult(HULLMOD_ID, crewMult);
@@ -93,5 +83,20 @@ public class CostModifier {
         stats.getSuppliesPerMonth().unmodify(HULLMOD_ID);
         stats.getSuppliesToRecover().unmodify(HULLMOD_ID);
         stats.getFuelUseMod().unmodify(HULLMOD_ID);
+    }
+
+    /** Add the hidden operating-cost hullmod without mutating a stock template. */
+    public static void applyHullModIfNeeded(FleetMemberAPI member) {
+        if (member == null || member.getHullSpec() == null || member.getVariant() == null) return;
+        if (member.isStation()) return;
+
+        HullSize size = member.getHullSpec().getHullSize();
+        if (size != HullSize.CRUISER && size != HullSize.CAPITAL_SHIP) return;
+        if (member.getVariant().hasHullMod(HULLMOD_ID)) return;
+
+        ShipVariantAPI variant = VariantUtils.getMutableVariant(member);
+        if (variant != null && !variant.hasHullMod(HULLMOD_ID)) {
+            variant.addPermaMod(HULLMOD_ID, false);
+        }
     }
 }

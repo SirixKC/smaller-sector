@@ -5,6 +5,7 @@ A Starsector mod that creates a frigate/destroyer-focused experience by making c
 ## Features
 
 ### Ship Replacement
+
 Cruisers and capitals are randomly replaced with smaller ships based on configurable percentages:
 
 - **Cruisers** → Can become frigates or destroyers
@@ -23,29 +24,30 @@ When replacing a ship, the mod uses a priority-based matching system to find the
 | 5-8 | Alternate size (frigate↔destroyer) | Same progression as above |
 | 9 | No replacement found | Ship stays as original |
 
-**Examples:**
-
-| Original Ship | Best Replacement | Why |
-|---------------|------------------|-----|
-| Hegemony Dominator (Low Tech) | Enforcer (Low Tech) | Matches faction, role (combat), and design type |
-| Hegemony Onslaught (XIV) | Enforcer (XIV) | XIV stays XIV - preserves rarity |
-| Tri-Tachyon Paragon (High Tech) | Medusa (High Tech) | High Tech carrier → High Tech combat if no carriers |
-| Persean Conquest (Midline) | Hammerhead (Midline) | Midline carrier → Midline combat |
-| Pirate Atlas Mk.II | Any Pirate destroyer | Pirates lack design type consistency |
-
-This ensures Low Tech fleets stay Low Tech, XIV Battlegroup ships remain rare, and faction identity is preserved.
+This prioritizes role and manufacturer identity—such as Low Tech or XIV designs—while retaining a same-faction fallback when no close match exists.
 
 ### Operating Cost Multipliers
-Cruisers and capitals that survive replacement have increased operating costs:
+
+Player-owned cruisers and capitals have configurable operating costs:
+
 - Crew requirements
 - Supply consumption
 - Fuel consumption
 
-### Build Cost Multipliers
-Purchase prices and colony production costs are multiplied for larger ships.
+### Build Cost Multipliers (In Development)
+
+The settings remain reserved for this feature, but the unsafe experimental reflection path is disabled. Production-cost and production-time multipliers still need to be implemented and verified.
 
 ### D-Mod Penalties
-Player-built or acquired cruisers/capitals receive automatic D-mods, representing the difficulty of maintaining such complex vessels.
+
+Player-built or acquired cruisers/capitals receive automatic D-mods, representing the difficulty of maintaining such complex vessels. Ships delivered directly to storage receive this one-time penalty when first withdrawn.
+
+### Planned
+
+- Working production-cost and production-time multipliers
+- Salvage and ship-recovery chance multipliers
+
+Blueprint replacement is not planned.
 
 ---
 
@@ -54,6 +56,7 @@ Player-built or acquired cruisers/capitals receive automatic D-mods, representin
 All settings are configurable via **LunaLib** (press `F3` in campaign). Choose a preset or use Custom for full control.
 
 ### Vanilla (Disabled)
+
 No changes - the mod effectively does nothing. Useful for temporarily disabling without removing.
 
 | Setting | Value |
@@ -64,6 +67,7 @@ No changes - the mod effectively does nothing. Useful for temporarily disabling 
 | Faction blacklist | None |
 
 ### Sirix Recommended
+
 Balanced experience - cruisers and capitals are notably rarer but still achievable.
 
 | Setting | Cruiser | Capital |
@@ -75,10 +79,13 @@ Balanced experience - cruisers and capitals are notably rarer but still achievab
 | Crew multiplier | 1.5x | 2.0x |
 | Supply multiplier | 1.5x | 2.0x |
 | Fuel multiplier | 1.5x | 2.0x |
-| Build cost multiplier | 1.5x | 2.0x |
+| Build cost multiplier (planned) | 1.5x | 2.0x |
 | D-mods on acquisition | 2 | 3 |
 
+Build-cost values are reserved for the planned feature and are not currently applied.
+
 ### Sirix Hardcore
+
 Punishing experience - cruisers are rare, capitals are exceptional finds.
 
 | Setting | Cruiser | Capital |
@@ -90,10 +97,13 @@ Punishing experience - cruisers are rare, capitals are exceptional finds.
 | Crew multiplier | 2.0x | 3.0x |
 | Supply multiplier | 3.0x | 4.0x |
 | Fuel multiplier | 3.0x | 4.0x |
-| Build cost multiplier | 3.0x | 5.0x |
+| Build cost multiplier (planned) | 3.0x | 5.0x |
 | D-mods on acquisition | 3 | 5 |
 
+Build-cost values are reserved for the planned feature and are not currently applied.
+
 ### Custom
+
 Use the individual sliders to define your own experience.
 
 ---
@@ -104,7 +114,7 @@ Blacklisted factions are **exempt from ship replacement** - their fleets and mar
 
 ### Managing the Blacklist
 
-**In-Game (Recommended):** Open the Intel screen → Missions tab → "Smaller Sector - Faction Manager". This shows all loaded factions and lets you toggle them with one click.
+**In-Game (Recommended):** Open the Intel screen → Missions tab → "Smaller Sector - Faction Manager". This shows all loaded factions and lets you toggle custom entries. Defaults supplied by the active Sirix preset are shown read-only.
 
 **Via LunaLib:** Enter comma-separated faction IDs in the settings.
 
@@ -121,7 +131,7 @@ The Sirix presets automatically blacklist AI and special factions:
 | Hazard Mining Inc. | Mess | `mess` |
 | Jaydeena's Piracy | ERROR: DATA INVALID | `jdp_deadcomm` |
 | Emergent Threats | Threat | `threat` |
-| Random Assortment | Abyssals (all variants) | `rat_abyssals*` |
+| Random Assortment | Abyssals (enumerated variants) | `rat_abyssals` family |
 | Secrets of the Frontier | Dreaming Gestalt | `sotf_dreaminggestalt` |
 | Elysian Fields | Elysians | `zea_elysians` |
 | Elysian Fields | Duskborne | `zea_dusk` |
@@ -137,13 +147,14 @@ The Sirix presets automatically blacklist AI and special factions:
 | System | When | Notes |
 |--------|------|-------|
 | **NPC Fleets** | On spawn | Checked once, permanent |
-| **Markets/Shops** | On game load + economy ticks | Ships for sale are replaced |
-| **Derelicts** | On discovery | Replaced when player approaches |
+| **Markets/Shops** | On stock generation/refresh | Each procedural sale ship is checked once, even if it survives a later refresh |
+| **Derelicts** | Before visibility | New procedural wrecks are checked once |
 | **Player Fleet** | On acquisition | D-mods and cost modifiers applied |
 
 ## What Is NOT Affected
 
-- **Existing fleet members** - Ships already in your fleet stay as-is
+- **Existing player ships** - Not replaced and receive no retroactive acquisition D-mods; operating-cost settings still apply
+- **Player storage/free-transfer cargo** - Never considered market sale stock
 - **Unique/named ships** - Story-critical ships are preserved
 - **Blacklisted factions** - Configure via settings or in-game manager
 - **Already-processed entities** - Ships won't re-roll on save/load
@@ -152,9 +163,10 @@ The Sirix presets automatically blacklist AI and special factions:
 
 ## Requirements
 
-- Starsector 0.98a+
+- Starsector 0.98a-RC8
 - [LunaLib](https://fractalsoftworks.com/forum/index.php?topic=25658.0)
 - [LazyLib](https://fractalsoftworks.com/forum/index.php?topic=5444.0)
+- [MagicLib](https://fractalsoftworks.com/forum/index.php?topic=13718.0)
 
 ---
 
@@ -169,7 +181,7 @@ The Sirix presets automatically blacklist AI and special factions:
 
 ## Compatibility
 
-- **Ship packs**: Fully compatible - uses faction doctrine and role/design type matching
+- **Ship packs**: Supported through faction role/design-type matching; unusual hull or variant definitions may remain unchanged
 - **Fleet mods**: May conflict with mods that heavily modify fleet spawning
 - **Vanilla files**: None modified - pure scripted mod
 
@@ -178,7 +190,7 @@ The Sirix presets automatically blacklist AI and special factions:
 ## Technical Notes
 
 - Uses `FleetSpawnListener` for NPC fleets
-- Uses `EconomyTickListener` for markets
-- Uses `DiscoverEntityListener` for derelicts
-- Replacement decisions are tagged to prevent re-rolling on save/load
-- All settings read from LunaLib at runtime
+- Uses market-open and economy listeners for natural stock refreshes
+- Uses discovery events plus a bounded current-location scan for derelicts
+- Replacement decisions are persistently marked or tracked to prevent re-rolling on save/load
+- Active behavior settings are read from LunaLib at runtime
