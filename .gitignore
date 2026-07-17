@@ -4,3 +4,6 @@ jars/
 *.log
 .idea/
 *.iml
+
+# Local convenience symlink; including it in an archive recurses into this repo.
+smaller-sector
